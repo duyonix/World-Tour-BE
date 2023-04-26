@@ -11,4 +11,6 @@ public class FileProperties {
     private String bucketName;
 
     private String imageUrl;
+
+    private String bucketFolderName;
 }

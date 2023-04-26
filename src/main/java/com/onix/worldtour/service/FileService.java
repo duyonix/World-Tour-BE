@@ -60,18 +60,17 @@ public class FileService {
         return String.format(properties.getImageUrl(), name);
     }
 
-    public String save(MultipartFile file) throws IOException {
-
+    public String save(MultipartFile file, String folder) throws IOException {
         Bucket bucket = StorageClient.getInstance().bucket();
 
         String name = generateFileName(file.getOriginalFilename());
+        String objectName = properties.getBucketFolderName() + (!folder.equals("") ? "/" + folder + "/" + name : "/" + name);
 
-        bucket.create(name, file.getBytes(), file.getContentType());
-
-        return name;
+        bucket.create(objectName, file.getBytes(), file.getContentType());
+        return objectName;
     }
 
-    public String save(String url) throws IOException {
+    public String save(String url, String folder) throws IOException {
         URL fileUrl = new URL(url);
         HttpURLConnection connection = (HttpURLConnection) fileUrl.openConnection();
         connection.setRequestMethod("GET");
@@ -80,7 +79,8 @@ public class FileService {
 
         String fileName = getFileNameFromUrl(url);
         String fileType = getFileNameExtension(fileName);
-        String firebaseFileName = generateFileName(fileName);
+        String name = generateFileName(fileName);
+        String firebaseFileName = properties.getBucketFolderName() + (!folder.equals("") ? "/" + folder + "/" + name : "/" + name);
 
         Bucket bucket = StorageClient.getInstance().bucket();
 

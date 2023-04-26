@@ -15,4 +15,6 @@ import lombok.experimental.Accessors;
 public class UrlRequest {
     @NotBlank(message = "Url is required")
     private String url;
+
+    private String folder = "";
 }
