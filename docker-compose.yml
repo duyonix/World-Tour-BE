@@ -4,9 +4,9 @@ services:
   postgres:
     image: 'postgres:latest'
     environment:
-      POSTGRES_USER: onix
-      POSTGRES_PASSWORD: 123456
-      POSTGRES_DB: world-tour
+      POSTGRES_USER: wxamsxipwlutke
+      POSTGRES_PASSWORD: 7256fb6fa43e5a50b7c01b302e95d0831482c83b17f08536895375850037f72c
+      POSTGRES_DB: df5u53e95vjm17
     volumes:
       - postgres-data:/var/lib/postgresql/data
     ports:
@@ -16,9 +16,9 @@ services:
     depends_on:
       - postgres
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/world-tour
-      SPRING_DATASOURCE_USERNAME: onix
-      SPRING_DATASOURCE_PASSWORD: 123456
+      SPRING_DATASOURCE_URL: jdbc:postgresql://ec2-44-213-151-75.compute-1.amazonaws.com:5432/df5u53e95vjm17
+      SPRING_DATASOURCE_USERNAME: wxamsxipwlutke
+      SPRING_DATASOURCE_PASSWORD: 7256fb6fa43e5a50b7c01b302e95d0831482c83b17f08536895375850037f72c
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     ports:
       - "8080:8080"
