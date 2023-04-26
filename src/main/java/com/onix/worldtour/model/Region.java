@@ -56,6 +56,25 @@ public class Region {
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Region> children = new ArrayList<>();
 
+    @Column(name = "review", columnDefinition = "TEXT")
+    private String review;
+
+    @Column(name = "population", columnDefinition = "BIGINT")
+    private Long population;
+
+    @Column(name = "area", columnDefinition = "DOUBLE PRECISION")
+    private Double area;
+
+    @OneToOne(mappedBy = "region", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, optional = true)
+    @JsonIgnoreProperties("region")
+    private Country country;
+
+    @OneToMany(mappedBy = "region", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Costume> costumes;
+
+    @OneToMany(mappedBy = "region", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SceneSpot> sceneSpots;
+
     public void addChild(Region child) {
         children.add(child);
         child.setParent(this);
