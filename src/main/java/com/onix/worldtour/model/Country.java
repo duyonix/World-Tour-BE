@@ -23,7 +23,7 @@ public class Country {
     @Column(name = "code", nullable = false, unique = true, columnDefinition = "TEXT")
     private String code;
 
-        @Column(name = "capital", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "capital", nullable = false, columnDefinition = "TEXT")
     private String capital;
 
     @Column(name = "language", nullable = false, columnDefinition = "TEXT")

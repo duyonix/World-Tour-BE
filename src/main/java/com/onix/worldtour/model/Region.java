@@ -26,7 +26,7 @@ public class Region {
     @Column(name = "name", nullable = false, columnDefinition = "TEXT")
     private String name;
 
-    @Column(name = "commonName", columnDefinition = "TEXT")
+    @Column(name = "commonName", nullable = false, columnDefinition = "TEXT")
     private String commonName;
 
     @Column(name = "description", columnDefinition = "TEXT")
