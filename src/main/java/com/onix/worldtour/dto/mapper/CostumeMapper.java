@@ -3,6 +3,7 @@ package com.onix.worldtour.dto.mapper;
 import com.onix.worldtour.controller.request.CostumeRequest;
 import com.onix.worldtour.dto.model.CostumeDto;
 import com.onix.worldtour.model.Costume;
+import com.onix.worldtour.model.CostumeType;
 import com.onix.worldtour.model.Region;
 
 public class CostumeMapper {
@@ -17,6 +18,7 @@ public class CostumeMapper {
     }
 
     public static CostumeDto toCostumeDto(Costume costume) {
+        Integer regionId = costume.getRegion() != null ? costume.getRegion().getId() : null;
         return new CostumeDto()
                 .setId(costume.getId())
                 .setName(costume.getName())
@@ -24,11 +26,12 @@ public class CostumeMapper {
                 .setPicture(costume.getPicture())
                 .setModel(costume.getModel())
                 .setType(costume.getType())
-                .setRegionId(costume.getRegion().getId())
-                .setRegion(RegionMapper.toRegionDtoForCostume(costume.getRegion()));
+                .setRegionId(regionId)
+                .setRegion(regionId != null ? RegionMapper.toRegionDtoForCostume(costume.getRegion()) : null);
     }
 
     public static CostumeDto toCostumeDtoForRegion(Costume costume) {
+        Integer regionId = costume.getRegion() != null ? costume.getRegion().getId() : null;
         return new CostumeDto()
                 .setId(costume.getId())
                 .setName(costume.getName())
@@ -36,6 +39,6 @@ public class CostumeMapper {
                 .setPicture(costume.getPicture())
                 .setModel(costume.getModel())
                 .setType(costume.getType())
-                .setRegionId(costume.getRegion().getId());
+                .setRegionId(regionId);
     }
 }

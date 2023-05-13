@@ -1,6 +1,7 @@
 package com.onix.worldtour.repository;
 
 import com.onix.worldtour.model.Costume;
+import com.onix.worldtour.model.CostumeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,9 +14,13 @@ public interface CostumeRepository extends JpaRepository<Costume, Integer> {
     Optional<Costume> findByName(String name);
 
     @Query(value = """
-        SELECT s FROM Costume s\s
-        WHERE s.name LIKE %:name% AND\s
-        (:regionId IS NULL OR s.region.id = :regionId)\s
+        SELECT c FROM Costume c
+        WHERE c.name LIKE %:name%
+        AND (:regionId IS NULL OR c.region.id = :regionId)
+        AND (:type IS NULL OR c.type = :type)
         """)
-    Page<Costume> findByNameContainingAndRegionId(@Param("name") String name, @Param("regionId") Integer regionId, Pageable pageable);
+    Page<Costume> findByNameContainingAndRegionIdAndType(@Param("name") String name,
+                                                         @Param("regionId") Integer regionId,
+                                                         @Param("type") CostumeType type,
+                                                         Pageable pageable);
 }

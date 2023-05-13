@@ -29,7 +29,6 @@ public class CostumeRequest {
     @NotNull(message = "Type is required")
     private CostumeType type;
 
-    @NotNull(message = "Region ID is required")
     private Integer regionId;
 }
 

@@ -83,7 +83,7 @@ public class ApplicationException {
         } else if (ExceptionType.NOT_MATCH.equals(exceptionType)) {
             return new EntityNotMatchException(format(messageTemplate, args));
         }
-        return (RuntimeException) new Exception(format(messageTemplate, args));
+        return new RuntimeException(format(messageTemplate, args));
     }
 
     private static String getMessageTemplate(EntityType entityType, ExceptionType exceptionType) {

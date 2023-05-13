@@ -35,10 +35,11 @@ public class CostumeController {
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "10") Integer size,
             @RequestParam(value = "search", defaultValue = "") String search,
-            @RequestParam(value = "regionId", required = false) Integer regionId
+            @RequestParam(value = "regionId", required = false) Integer regionId,
+            @RequestParam(value = "type", required = false) String type
     ) {
-        log.info("CostumeController::getCostumes page {} size {} search {} regionId {}", page, size, search, regionId);
-        Page<CostumeDto> costumes = costumeService.getCostumes(page, size, search, regionId);
+        log.info("CostumeController::getCostumes page {} size {} search {} regionId {} type {}", page, size, search, regionId, type);
+        Page<CostumeDto> costumes = costumeService.getCostumes(page, size, search, regionId, type);
 
         Response<Object> response = Response.ok().setPayload(costumes);
         log.info("CostumeController::getCostumes response {}", ValueMapper.jsonAsString(response));

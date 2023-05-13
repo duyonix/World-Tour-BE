@@ -7,6 +7,7 @@ import com.onix.worldtour.exception.ApplicationException;
 import com.onix.worldtour.exception.EntityType;
 import com.onix.worldtour.exception.ExceptionType;
 import com.onix.worldtour.model.Costume;
+import com.onix.worldtour.model.CostumeType;
 import com.onix.worldtour.model.Region;
 import com.onix.worldtour.repository.CostumeRepository;
 import com.onix.worldtour.repository.RegionRepository;
@@ -39,14 +40,25 @@ public class CostumeService {
                     throw exception(EntityType.COSTUME, ExceptionType.DUPLICATE_ENTITY, costumeRequest.getName());
                 });
 
-        Region region = regionRepository.findById(costumeRequest.getRegionId())
-                .orElseThrow(() -> {
-                    log.error("CostumeService::addCostume execution failed with invalid region id {}", costumeRequest.getRegionId());
-                    throw exception(EntityType.REGION, ExceptionType.ENTITY_NOT_FOUND, costumeRequest.getRegionId().toString());
-                });
+        Region region = null;
+        boolean isSpecific = costumeRequest.getType().equals(CostumeType.SPECIFIC);
+        if (isSpecific) {
+            Integer regionId = costumeRequest.getRegionId();
+            if(regionId == null) {
+                log.error("CostumeService::addCostume execution failed for specific type with null region id");
+                throw exception(EntityType.REGION, ExceptionType.ENTITY_NOT_FOUND, "null");
+            }
+
+            region = regionRepository.findById(regionId)
+                    .orElseThrow(() -> {
+                        log.error("CostumeService::addCostume execution failed for specific type with invalid region id {}", regionId);
+                        throw exception(EntityType.REGION, ExceptionType.ENTITY_NOT_FOUND, regionId.toString());
+                    });
+        }
 
         try {
-            Costume newCostume = CostumeMapper.toCostume(costumeRequest, region);
+            Region applyRegion = isSpecific ? region : null;
+            Costume newCostume = CostumeMapper.toCostume(costumeRequest, applyRegion);
             log.debug("CostumeService::addCostume request parameters {}", ValueMapper.jsonAsString(newCostume));
 
             Costume savedCostume = costumeRepository.save(newCostume);
@@ -61,14 +73,15 @@ public class CostumeService {
         return costumeDto;
     }
 
-    public Page<CostumeDto> getCostumes(Integer page, Integer size, String search, Integer regionId) {
+    public Page<CostumeDto> getCostumes(Integer page, Integer size, String search, Integer regionId, String type) {
         log.info("CostumeService::getCostumes execution started");
         Page<CostumeDto> costumeDtos;
 
         try {
-            log.debug("CostumeService::getCostumes request parameters page {}, size {}, search {}, regionId {}", page, size, search, regionId);
+            log.debug("CostumeService::getCostumes request parameters page {}, size {}, search {}, regionId {} type {}", page, size, search, regionId, type);
             Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
-            Page<Costume> costumes = costumeRepository.findByNameContainingAndRegionId(search, regionId, pageable);
+            CostumeType costumeType = type != null ? CostumeType.valueOf(type.toUpperCase()) : null;
+            Page<Costume> costumes = costumeRepository.findByNameContainingAndRegionIdAndType(search, regionId, costumeType, pageable);
             log.info("CostumeService::getCostumes received response from database costumes {}", ValueMapper.jsonAsString(costumes));
 
             costumeDtos = costumes.map(CostumeMapper::toCostumeDto);
@@ -119,14 +132,25 @@ public class CostumeService {
                     }
                 });
 
-        Region region = regionRepository.findById(costumeRequest.getRegionId())
-                .orElseThrow(() -> {
-                    log.error("CostumeService::updateCostume execution failed with invalid region id {}", costumeRequest.getRegionId());
-                    throw exception(EntityType.REGION, ExceptionType.ENTITY_NOT_FOUND, costumeRequest.getRegionId().toString());
-                });
+        Region region = null;
+        boolean isSpecific = costumeRequest.getType().equals(CostumeType.SPECIFIC);
+        if (isSpecific) {
+            Integer regionId = costumeRequest.getRegionId();
+            if(regionId == null) {
+                log.error("CostumeService::updateCostume execution failed for specific type with null region id");
+                throw exception(EntityType.REGION, ExceptionType.ENTITY_NOT_FOUND, "null");
+            }
+
+            region = regionRepository.findById(regionId)
+                    .orElseThrow(() -> {
+                        log.error("CostumeService::updateCostume execution failed for specific type with invalid region id {}", regionId);
+                        throw exception(EntityType.REGION, ExceptionType.ENTITY_NOT_FOUND, regionId.toString());
+                    });
+        }
 
         try {
-            Costume updatedCostume = CostumeMapper.toCostume(costumeRequest, region);
+            Region applyRegion = isSpecific ? region : null;
+            Costume updatedCostume = CostumeMapper.toCostume(costumeRequest, applyRegion);
             updatedCostume.setId(costume.getId());
             log.debug("CostumeService::updateCostume request parameters {}", ValueMapper.jsonAsString(updatedCostume));
 
