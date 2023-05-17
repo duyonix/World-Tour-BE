@@ -1,9 +1,10 @@
-package com.onix.worldtour.dto.model;
+package com.onix.worldtour.controller.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.onix.worldtour.model.Coordinate;
-import com.onix.worldtour.model.Country;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,29 +17,28 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class RegionDto {
-    private Integer id;
-
+public class RegionRequest {
+    @NotBlank(message = "Name is required")
     private String name;
 
+    @NotBlank(message = "Common name is required")
     private String commonName;
 
     private String description;
 
+    @NotBlank(message = "Picture is required")
     private String picture;
 
+    @NotEmpty(message = "Backgrounds is required")
     private List<String> backgrounds;
 
+    @NotNull(message = "Coordinate is required")
     private Coordinate coordinate;
 
+    @NotNull(message = "Category ID is required")
     private Integer categoryId;
 
-    private CategoryDto category;
-
     private Integer parentId;
-
-    private RegionDto parent;
 
     private String review;
 
@@ -46,11 +46,7 @@ public class RegionDto {
 
     private Double area;
 
-    private Integer countryId;
+    private CountryRequest country;
 
-    private CountryDto country;
-
-    private List<SceneSpotDto> sceneSpots;
-
-    private List<CostumeDto> costumes;
+    private List<SceneSpotRequest> sceneSpots;
 }

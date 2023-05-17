@@ -27,7 +27,7 @@ public class CostumeMapper {
                 .setModel(costume.getModel())
                 .setType(costume.getType())
                 .setRegionId(regionId)
-                .setRegion(regionId != null ? RegionMapper.toRegionDtoForCostume(costume.getRegion()) : null);
+                .setRegion(regionId != null ? RegionMapper.toRegionOptionDto(costume.getRegion()) : null);
     }
 
     public static CostumeDto toCostumeDtoForRegion(Costume costume) {

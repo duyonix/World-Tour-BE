@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface RegionRepository extends JpaRepository<Region, Integer> {
@@ -19,4 +20,5 @@ public interface RegionRepository extends JpaRepository<Region, Integer> {
         """)
     Page<Region> findByNameContainingAndCategoryId(@Param("name") String name, @Param("categoryId") Integer categoryId, Pageable pageable);
 
+    List<Region> findByNameContaining(String name);
 }
