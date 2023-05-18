@@ -13,6 +13,8 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CountryRequest {
+    private Integer id;
+
     @NotBlank(message = "Code is required")
     private String code;
 

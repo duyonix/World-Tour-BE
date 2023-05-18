@@ -13,6 +13,8 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SceneSpotRequest {
+    private Integer id;
+
     @NotBlank(message = "Name is required")
     private String name;
 

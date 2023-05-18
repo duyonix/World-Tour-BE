@@ -45,7 +45,7 @@ public class Region {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
-    @JsonIgnoreProperties("regions")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "regions"})
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)

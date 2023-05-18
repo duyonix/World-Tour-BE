@@ -41,6 +41,7 @@ public class RegionService {
     @Autowired
     private SceneSpotRepository sceneSpotRepository;
 
+    @Transactional
     public RegionDto addRegion(RegionRequest regionRequest) {
         log.info("RegionService::addRegion execution started");
         RegionDto regionDto;
@@ -72,11 +73,17 @@ public class RegionService {
         try {
             Region newRegion = RegionMapper.toRegion(regionRequest)
                     .setCategory(category)
-                    .setParent(parent)
-                    .setCountry(country);
+                    .setParent(parent);
             log.debug("RegionService::addRegion request parameters {}", ValueMapper.jsonAsString(newRegion));
 
             Region savedRegion = regionRepository.save(newRegion);
+
+            if (country != null) {
+                country.setRegion(savedRegion);
+                Country savedCountry = countryRepository.save(country);
+                savedRegion.setCountry(savedCountry);
+            }
+
             regionDto = RegionMapper.toRegionDto(savedRegion);
             log.debug("RegionService::addRegion received response from database {}", ValueMapper.jsonAsString(regionDto));
         } catch (Exception e) {
@@ -141,6 +148,7 @@ public class RegionService {
         return regionDto;
     }
 
+    @Transactional
     public RegionDto updateRegion(Integer id, RegionRequest regionRequest) {
         log.info("RegionService::updateRegion execution started");
         RegionDto regionDto;
@@ -181,11 +189,17 @@ public class RegionService {
                     .setId(id)
                     .setCategory(category)
                     .setParent(parent)
-                    .setCountry(country)
+                    .setCostumes(region.getCostumes())
                     .setSceneSpots(region.getSceneSpots());
             log.debug("RegionService::updateRegion saving region to database {}", ValueMapper.jsonAsString(updatedRegion));
-
             Region savedRegion = regionRepository.save(updatedRegion);
+
+            if (country != null) {
+                country.setRegion(savedRegion);
+                Country savedCountry = countryRepository.save(country);
+                savedRegion.setCountry(savedCountry);
+            }
+
             regionDto = RegionMapper.toRegionDto(savedRegion);
             log.debug("RegionService::updateRegion received response from database {}", ValueMapper.jsonAsString(regionDto));
         } catch (Exception e) {

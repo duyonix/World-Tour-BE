@@ -7,6 +7,7 @@ import com.onix.worldtour.model.Country;
 public class CountryMapper {
     public static Country toCountry(CountryRequest countryRequest) {
         return new Country()
+                .setId(countryRequest.getId())
                 .setCode(countryRequest.getCode())
                 .setCapital(countryRequest.getCapital())
                 .setLanguage(countryRequest.getLanguage())
