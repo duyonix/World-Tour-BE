@@ -16,9 +16,9 @@ services:
     depends_on:
       - postgres
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://ec2-44-213-151-75.compute-1.amazonaws.com:5432/df5u53e95vjm17
-      SPRING_DATASOURCE_USERNAME: wxamsxipwlutke
-      SPRING_DATASOURCE_PASSWORD: 7256fb6fa43e5a50b7c01b302e95d0831482c83b17f08536895375850037f72c
+      SPRING_DATASOURCE_URL: jdbc:postgresql://ec2-34-202-127-5.compute-1.amazonaws.com:5432/db3ugk35kce5lq
+      SPRING_DATASOURCE_USERNAME: pdlyvgqadmaxxy
+      SPRING_DATASOURCE_PASSWORD: 6c1f67252d168f5b3feebac4964aa84350350f49c78273159263bef82096b657
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     ports:
       - "8080:8080"
