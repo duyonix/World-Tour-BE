@@ -20,10 +20,10 @@ public class Country {
     @Column(name = "id", updatable = false)
     private Integer id;
 
-    @Column(name = "code", nullable = false, unique = true, columnDefinition = "TEXT")
+    @Column(name = "code", nullable = false, columnDefinition = "TEXT")
     private String code;
 
-        @Column(name = "capital", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "capital", nullable = false, columnDefinition = "TEXT")
     private String capital;
 
     @Column(name = "language", nullable = false, columnDefinition = "TEXT")
@@ -37,6 +37,6 @@ public class Country {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "region_id", nullable = false)
-    @JsonIgnoreProperties("country")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "country", "category", "children", "parent", "costumes", "sceneSpots"})
     private Region region;
 }

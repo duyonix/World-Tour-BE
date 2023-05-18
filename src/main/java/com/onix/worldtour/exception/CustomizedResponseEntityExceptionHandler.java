@@ -53,7 +53,7 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
         return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler(RuntimeException.class)
     public final ResponseEntity handleAllExceptions(Exception ex, WebRequest request) {
         Response<Object> response = Response.exception();
         response.addErrorMsgToResponse(ex.getMessage(), ex);

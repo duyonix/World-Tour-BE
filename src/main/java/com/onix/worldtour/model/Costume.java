@@ -32,7 +32,8 @@ public class Costume {
     @Column(name = "model", nullable = false, columnDefinition = "TEXT")
     private String model;
 
-    @Column(name = "type", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
     private CostumeType type = CostumeType.COMMON;
 
     @ManyToOne(fetch = FetchType.LAZY)
