@@ -23,16 +23,16 @@ public class Country {
     @Column(name = "code", nullable = false, columnDefinition = "TEXT")
     private String code;
 
-    @Column(name = "capital", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "capital", columnDefinition = "TEXT")
     private String capital;
 
-    @Column(name = "language", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "language", columnDefinition = "TEXT")
     private String language;
 
-    @Column(name = "currency", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "currency", columnDefinition = "TEXT")
     private String currency;
 
-    @Column(name = "timezone", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "timezone", columnDefinition = "TEXT")
     private String timezone;
 
     @OneToOne(fetch = FetchType.LAZY)

@@ -53,4 +53,6 @@ public class RegionDto {
     private List<SceneSpotDto> sceneSpots;
 
     private List<CostumeDto> costumes;
+
+    private WeatherDto weather;
 }
