@@ -21,4 +21,8 @@ public interface RegionRepository extends JpaRepository<Region, Integer> {
     Page<Region> findByNameContainingAndCategoryId(@Param("name") String name, @Param("categoryId") Integer categoryId, Pageable pageable);
 
     List<Region> findByNameContaining(String name);
+
+    List<Region> findByCategoryLevel(Integer level);
+
+    Optional<Region> findByNameAndCategoryId(String name, Integer categoryId);
 }

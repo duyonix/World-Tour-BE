@@ -1,9 +1,11 @@
 package com.onix.worldtour.service;
 
+import com.onix.worldtour.controller.request.CountryRestData;
 import com.onix.worldtour.controller.request.RegionRequest;
 import com.onix.worldtour.dto.mapper.CountryMapper;
 import com.onix.worldtour.dto.mapper.RegionMapper;
 import com.onix.worldtour.dto.model.RegionDto;
+import com.onix.worldtour.dto.model.WeatherDto;
 import com.onix.worldtour.exception.ApplicationException;
 import com.onix.worldtour.exception.EntityType;
 import com.onix.worldtour.exception.ExceptionType;
@@ -22,7 +24,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -41,13 +45,16 @@ public class RegionService {
     @Autowired
     private SceneSpotRepository sceneSpotRepository;
 
+    @Autowired
+    private WeatherService weatherService;
+
     @Transactional
     public RegionDto addRegion(RegionRequest regionRequest) {
         log.info("RegionService::addRegion execution started");
         RegionDto regionDto;
 
-        regionRepository.findByName(regionRequest.getName()).ifPresent(region -> {
-            log.error("RegionService::addRegion execution failed with duplicate region name {}", regionRequest.getName());
+        regionRepository.findByNameAndCategoryId(regionRequest.getName(), regionRequest.getCategoryId()).ifPresent(region -> {
+            log.error("RegionService::addRegion execution failed with duplicate name {} and category {}", regionRequest.getName(), regionRequest.getCategoryId());
             throw exception(EntityType.REGION, ExceptionType.DUPLICATE_ENTITY, regionRequest.getName());
         });
 
@@ -142,10 +149,38 @@ public class RegionService {
             return exception(EntityType.REGION, ExceptionType.ENTITY_NOT_FOUND, id.toString());
         });
         regionDto = RegionMapper.toRegionDto(region);
+        // region has category level >=4 then get weather for it
+        if(region.getCategory().getLevel() >= 4) {
+            WeatherDto weather = weatherService.getWeather(region.getCoordinate());
+            regionDto.setWeather(weather);
+        }
+
         log.debug("RegionService::getRegion received response from database {}", ValueMapper.jsonAsString(regionDto));
 
         log.info("RegionService::getRegion execution completed");
         return regionDto;
+    }
+
+    @Transactional
+    public void importCountries() {
+        log.info("RegionService::importCountries execution started");
+        String apiUrl = "https://restcountries.com/v3.1/all";
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<CountryRestData[]> response = restTemplate.getForEntity(apiUrl, CountryRestData[].class);
+            CountryRestData[] countryDataArray = response.getBody();
+
+            // get List of Regions has category level 3: Region
+            List<Region> parentRegions = regionRepository.findByCategoryLevel(3);
+
+            for (CountryRestData countryData : countryDataArray) {
+                RegionRequest regionRequest = RegionMapper.toRegionRequestForCountry(countryData, parentRegions);
+                addRegion(regionRequest);
+            }
+        } catch (Exception e) {
+            log.error("RegionService::importCountries execution failed with error {}", e.getMessage());
+            throw exception(EntityType.REGION, ExceptionType.ENTITY_EXCEPTION, e.getMessage());
+        }
     }
 
     @Transactional
@@ -159,7 +194,7 @@ public class RegionService {
             throw exception(EntityType.REGION, ExceptionType.ENTITY_NOT_FOUND, id.toString());
         });
 
-        Region duplicateRegion = regionRepository.findByName(regionRequest.getName()).orElse(null);
+        Region duplicateRegion = regionRepository.findByNameAndCategoryId(regionRequest.getName(), regionRequest.getCategoryId()).orElse(null);
         if (duplicateRegion != null && !duplicateRegion.getId().equals(id)) {
             log.error("RegionService::updateRegion execution failed with duplicate region name {}", regionRequest.getName());
             throw exception(EntityType.REGION, ExceptionType.DUPLICATE_ENTITY, regionRequest.getName());
@@ -222,12 +257,15 @@ public class RegionService {
             throw exception(EntityType.REGION, ExceptionType.ENTITY_NOT_FOUND, id.toString());
         });
 
-        if (!region.getCostumes().isEmpty()) {
+        if (!region.getCostumes().isEmpty() || !region.getChildren().isEmpty()) {
             log.error("RegionService::deleteRegion execution failed with region is use");
             throw exception(EntityType.REGION, ExceptionType.ALREADY_USED_ELSEWHERE, id.toString());
         }
 
         try {
+            if (region.getCountry() != null) {
+                countryRepository.delete(region.getCountry());
+            }
             regionDto = RegionMapper.toRegionDto(region);
             regionRepository.delete(region);
             log.debug("RegionService::deleteRegion received response from database {}", ValueMapper.jsonAsString(regionDto));
