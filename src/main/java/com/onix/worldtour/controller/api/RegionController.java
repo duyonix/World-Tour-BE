@@ -37,10 +37,11 @@ public class RegionController {
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "10") Integer size,
             @RequestParam(value = "search", defaultValue = "") String search,
-            @RequestParam(value = "categoryId", required = false) Integer categoryId
+            @RequestParam(value = "categoryId", required = false) Integer categoryId,
+            @RequestParam(value = "parentId", required = false) Integer parentId
     ) {
-        log.info("RegionController::getRegions page {} size {} search {} categoryId {}", page, size, search, categoryId);
-        Page<RegionDto> regions = regionService.getRegions(page, size, search, categoryId);
+        log.info("RegionController::getRegions page {} size {} search {} categoryId {} parentId {}", page, size, search, categoryId, parentId);
+        Page<RegionDto> regions = regionService.getRegions(page, size, search, categoryId, parentId);
 
         Response<Object> response = Response.ok().setPayload(regions);
         log.info("RegionController::getRegions response {}", ValueMapper.jsonAsString(response));

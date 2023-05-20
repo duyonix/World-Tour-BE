@@ -105,13 +105,13 @@ public class RegionService {
         return regionDto;
     }
 
-    public Page<RegionDto> getRegions(Integer page, Integer size, String search, Integer categoryId) {
+    public Page<RegionDto> getRegions(Integer page, Integer size, String search, Integer categoryId, Integer parentId) {
         log.info("RegionService::getRegions execution started");
         Page<RegionDto> regionDtos;
         try {
-            log.debug("RegionService::getRegions request parameters page {}, size {}, search {}, categoryId {}", page, size, search, categoryId);
+            log.debug("RegionService::getRegions request parameters page {}, size {}, search {}, categoryId {}, parentId {}", page, size, search, categoryId, parentId);
             Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
-            Page<Region> regions = regionRepository.findByNameContainingAndCategoryId(search, categoryId, pageable);
+            Page<Region> regions = regionRepository.findByNameContainingAndCategoryIdAndParentId(search, categoryId, parentId, pageable);
 
             regionDtos = regions.map(RegionMapper::toRegionDtoForPage);
             log.debug("RegionService::getRegions received response from database {}", ValueMapper.jsonAsString(regionDtos));

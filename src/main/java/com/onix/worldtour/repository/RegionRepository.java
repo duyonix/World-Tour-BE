@@ -15,16 +15,20 @@ public interface RegionRepository extends JpaRepository<Region, Integer> {
 
     @Query(value = """
         SELECT s FROM Region s\s
-        WHERE s.name LIKE %:name% AND\s
-        (:categoryId IS NULL OR s.category.id = :categoryId)\s
+        WHERE lower(s.name) LIKE lower(concat('%', :name, '%')) AND
+        (:categoryId IS NULL OR s.category.id = :categoryId) AND
+        (:parentId IS NULL OR s.parent.id = :parentId)
         """)
-    Page<Region> findByNameContainingAndCategoryId(@Param("name") String name, @Param("categoryId") Integer categoryId, Pageable pageable);
+    Page<Region> findByNameContainingAndCategoryIdAndParentId(@Param("name") String name,
+                                                              @Param("categoryId") Integer categoryId,
+                                                              @Param("parentId") Integer parentId,
+                                                              Pageable pageable);
 
     List<Region> findByNameContaining(String name);
 
     @Query(value = """
         SELECT s FROM Region s\s
-        WHERE s.name LIKE %:name% AND\s
+        WHERE lower(s.name) LIKE lower(concat('%', :name, '%')) AND
         (:level IS NULL OR s.category.level = :level)
         """)
     List<Region> findByNameContainingAndCategoryLevel(@Param("name") String name, @Param("level") Integer level);
