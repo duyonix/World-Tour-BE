@@ -22,7 +22,16 @@ public interface RegionRepository extends JpaRepository<Region, Integer> {
 
     List<Region> findByNameContaining(String name);
 
+    @Query(value = """
+        SELECT s FROM Region s\s
+        WHERE s.name LIKE %:name% AND\s
+        (:level IS NULL OR s.category.level = :level)
+        """)
+    List<Region> findByNameContainingAndCategoryLevel(@Param("name") String name, @Param("level") Integer level);
+
     List<Region> findByCategoryLevel(Integer level);
 
     Optional<Region> findByNameAndCategoryId(String name, Integer categoryId);
+
+    List<Region> findByCategoryId(Integer id);
 }

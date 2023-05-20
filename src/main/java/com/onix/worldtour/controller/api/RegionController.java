@@ -49,10 +49,14 @@ public class RegionController {
 
     @GetMapping("/options")
     public ResponseEntity<Response> getRegionOptions(
-        @RequestParam(value = "search", defaultValue = "") String search
+        @RequestParam(value = "search", defaultValue = "") String search,
+        @RequestParam(value = "level", required = false) Integer level,
+        @RequestParam(value = "lattitude", required = false) Double lattitude,
+        @RequestParam(value = "longitude", required = false) Double longitude,
+        @RequestParam(value = "radius", required = false) Double radius
     ) {
-        log.info("RegionController::getRegionOptions search {}", search);
-        List<RegionDto> regions = regionService.getRegionOptions(search);
+        log.info("RegionController::getRegionOptions search {} level {} lattitude {} longitude {} radius {}", search, level, lattitude, longitude, radius);
+        List<RegionDto> regions = regionService.getRegionOptions(search, level, lattitude, longitude, radius);
 
         Response<Object> response = Response.ok().setPayload(regions);
         log.info("RegionController::getRegionOptions response {}", ValueMapper.jsonAsString(response));

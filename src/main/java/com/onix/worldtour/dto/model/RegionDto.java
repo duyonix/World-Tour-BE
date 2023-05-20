@@ -55,4 +55,6 @@ public class RegionDto {
     private List<CostumeDto> costumes;
 
     private WeatherDto weather;
+
+    private List<RegionDto> neighbors;
 }
