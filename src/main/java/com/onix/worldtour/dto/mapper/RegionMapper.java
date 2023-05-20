@@ -46,7 +46,7 @@ public class RegionMapper {
         Region parent = region.getParent() != null ? region.getParent() : null;
         Country country = region.getCountry() != null ? region.getCountry() : null;
 
-        RegionDto regionDto = new RegionDto()
+        return new RegionDto()
                 .setId(region.getId())
                 .setName(region.getName())
                 .setCommonName(region.getCommonName())
@@ -63,14 +63,6 @@ public class RegionMapper {
                 .setReview(region.getReview())
                 .setCountryId(country != null ? country.getId() : null)
                 .setCountry(country != null ? CountryMapper.toCountryDto(country) : null);
-
-        if (region.getCostumes() != null) {
-            regionDto.setCostumes(region.getCostumes().stream()
-                    .map(CostumeMapper::toCostumeDtoForRegion)
-                    .collect(Collectors.toList()));
-        }
-
-        return regionDto;
     }
 
     public static RegionDto toRegionDtoForPage(Region region) {

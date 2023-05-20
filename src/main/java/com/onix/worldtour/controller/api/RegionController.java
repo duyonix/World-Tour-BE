@@ -103,4 +103,14 @@ public class RegionController {
         log.info("RegionController::deleteRegion id {} response {}", id, ValueMapper.jsonAsString(response));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @GetMapping("/{id}/ancestors")
+    public ResponseEntity<Response> getAncestorRegions(@PathVariable("id") Integer id) {
+        log.info("RegionController::getAncestorRegions id {}", id);
+        List<RegionDto> regions = regionService.getAncestorRegions(id);
+
+        Response<Object> response = Response.ok().setPayload(regions);
+        log.info("RegionController::getAncestorRegions id {} response {}", id, ValueMapper.jsonAsString(response));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

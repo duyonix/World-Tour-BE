@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface CostumeRepository extends JpaRepository<Costume, Integer> {
@@ -15,12 +16,14 @@ public interface CostumeRepository extends JpaRepository<Costume, Integer> {
 
     @Query(value = """
         SELECT c FROM Costume c
-        WHERE c.name LIKE %:name%
-        AND (:regionId IS NULL OR c.region.id = :regionId)
-        AND (:type IS NULL OR c.type = :type)
+        WHERE lower(c.name) LIKE lower(concat('%', :name, '%')) AND
+        (:regionId IS NULL OR c.region.id = :regionId) AND
+        (:type IS NULL OR c.type = :type)
         """)
     Page<Costume> findByNameContainingAndRegionIdAndType(@Param("name") String name,
                                                          @Param("regionId") Integer regionId,
                                                          @Param("type") CostumeType type,
                                                          Pageable pageable);
+
+    List<Costume> findByRegionIdIn(List<Integer> regionIds);
 }

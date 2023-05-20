@@ -30,8 +30,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -295,6 +298,37 @@ public class RegionService {
 
         log.info("RegionService::deleteRegion execution completed");
         return regionDto;
+    }
+
+    public List<RegionDto> getAncestorRegions(Integer id) {
+        log.info("RegionService::getAncestorRegions execution started");
+        List<RegionDto> regionDtos;
+
+        log.debug("RegionService::getAncestorRegions request parameters id {}", id);
+        Region region = regionRepository.findById(id).orElseThrow(() -> {
+            log.error("RegionService::getAncestorRegions execution failed with invalid region id {}", id);
+            throw exception(EntityType.REGION, ExceptionType.ENTITY_NOT_FOUND, id.toString());
+        });
+
+        try {
+            List<Region> regions = new ArrayList<>();
+            Region parent = region.getParent();
+            while (parent != null) {
+                regions.add(parent);
+                parent = parent.getParent();
+            }
+
+            Collections.reverse(regions);
+            regionDtos = regions.stream().map(RegionMapper::toRegionOptionDto).toList();
+
+            log.debug("RegionService::getAncestorRegions received response from database {}", ValueMapper.jsonAsString(regionDtos));
+        } catch (Exception e) {
+            log.error("RegionService::getAncestorRegions execution failed with error {}", e.getMessage());
+            throw exception(EntityType.REGION, ExceptionType.ENTITY_EXCEPTION, e.getMessage());
+        }
+
+        log.info("RegionService::getAncestorRegions execution completed");
+        return regionDtos;
     }
 
     private RuntimeException exception(EntityType entityType, ExceptionType exceptionType, String... args) {

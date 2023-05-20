@@ -3,6 +3,7 @@ package com.onix.worldtour.service;
 import com.onix.worldtour.controller.request.CostumeRequest;
 import com.onix.worldtour.dto.mapper.CostumeMapper;
 import com.onix.worldtour.dto.model.CostumeDto;
+import com.onix.worldtour.dto.model.RegionDto;
 import com.onix.worldtour.exception.ApplicationException;
 import com.onix.worldtour.exception.EntityType;
 import com.onix.worldtour.exception.ExceptionType;
@@ -21,6 +22,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @Slf4j
 public class CostumeService {
@@ -29,6 +33,9 @@ public class CostumeService {
 
     @Autowired
     private RegionRepository regionRepository;
+
+    @Autowired
+    private RegionService regionService;
 
     public CostumeDto addCostume(CostumeRequest costumeRequest) {
         log.info("CostumeService::addCostume execution started");
@@ -92,6 +99,30 @@ public class CostumeService {
         }
 
         log.info("CostumeService::getCostumes execution completed");
+        return costumeDtos;
+    }
+
+    public List<CostumeDto> getCostumesForRegionAndAncestors(Integer regionId) {
+        log.info("CostumeService::getCostumesForRegionAndAncestors execution started");
+        List<CostumeDto> costumeDtos;
+
+        try {
+            log.debug("CostumeService::getCostumesForRegionAndAncestors request parameters regionId {}", regionId);
+            List<RegionDto> regions = regionService.getAncestorRegions(regionId);
+            List<Integer> regionIds = new ArrayList<>(regions.stream().map(RegionDto::getId).toList());
+            regionIds.add(regionId);
+
+            List<Costume> costumes = costumeRepository.findByRegionIdIn(regionIds);
+            log.debug("CostumeService::getCostumesForRegionAndAncestors received response from database costumes {}", ValueMapper.jsonAsString(costumes));
+
+            costumeDtos = costumes.stream().map(CostumeMapper::toCostumeDto).toList();
+            log.info("CostumeService::getCostumesForRegionAndAncestors received response from database {}", ValueMapper.jsonAsString(costumeDtos));
+        } catch (Exception e) {
+            log.error("CostumeService::getCostumesForRegionAndAncestors execution failed with error {}", e.getMessage());
+            throw exception(EntityType.COSTUME, ExceptionType.ENTITY_EXCEPTION, e.getMessage());
+        }
+
+        log.info("CostumeService::getCostumesForRegionAndAncestors execution completed");
         return costumeDtos;
     }
 

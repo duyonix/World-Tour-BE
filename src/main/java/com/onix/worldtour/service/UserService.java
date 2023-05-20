@@ -32,7 +32,7 @@ public class UserService {
         try {
             log.debug("UserService::getUsers request parameters page {}, size {}, search {}", page, size, search);
             Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
-            Page<User> users = userRepository.findByEmailContaining(search, pageable);
+            Page<User> users = userRepository.findByEmailContainingIgnoreCase(search, pageable);
 
             userDtos = users.map(UserMapper::toUserDto);
             log.debug("UserService::getUsers received response from database {}", userDtos);

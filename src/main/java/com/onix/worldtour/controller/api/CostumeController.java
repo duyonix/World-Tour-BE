@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/costumes")
 @Slf4j
@@ -43,6 +45,16 @@ public class CostumeController {
 
         Response<Object> response = Response.ok().setPayload(costumes);
         log.info("CostumeController::getCostumes response {}", ValueMapper.jsonAsString(response));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/for-region-and-ancestors/{regionId}")
+    public ResponseEntity<Response> getCostumesForRegionAndAncestors(@PathVariable("regionId") Integer regionId) {
+        log.info("CostumeController::getCostumesForRegionAndAncestors by regionId {}", regionId);
+        List<CostumeDto> costumes = costumeService.getCostumesForRegionAndAncestors(regionId);
+
+        Response<Object> response = Response.ok().setPayload(costumes);
+        log.info("CostumeController::getCostumesForRegionAndAncestors by regionId {} response {}", regionId, ValueMapper.jsonAsString(response));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
