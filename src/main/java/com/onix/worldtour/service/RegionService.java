@@ -10,12 +10,14 @@ import com.onix.worldtour.exception.ApplicationException;
 import com.onix.worldtour.exception.EntityType;
 import com.onix.worldtour.exception.ExceptionType;
 import com.onix.worldtour.model.Category;
+import com.onix.worldtour.model.Coordinate;
 import com.onix.worldtour.model.Country;
 import com.onix.worldtour.model.Region;
 import com.onix.worldtour.repository.CategoryRepository;
 import com.onix.worldtour.repository.CountryRepository;
 import com.onix.worldtour.repository.RegionRepository;
 import com.onix.worldtour.repository.SceneSpotRepository;
+import com.onix.worldtour.util.Util;
 import com.onix.worldtour.util.ValueMapper;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +30,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -121,12 +124,18 @@ public class RegionService {
         return regionDtos;
     }
 
-    public List<RegionDto> getRegionOptions(String search) {
+    public List<RegionDto> getRegionOptions(String search, Integer level, Double lattitude, Double longitude, Double radius) {
         log.info("RegionService::getRegionOptions execution started");
         List<RegionDto> regionDtos;
         try {
-            log.debug("RegionService::getRegionOptions request parameters search {}", search);
-            List<Region> regions = regionRepository.findByNameContaining(search);
+            log.debug("RegionService::getRegionOptions request parameters search {}, level {}, lattitude {}, longitude {}, radius {}", search, level, lattitude, longitude, radius);
+            List<Region> regions = regionRepository.findByNameContainingAndCategoryLevel(search, level);
+            if(lattitude != null && longitude != null && radius != null) {
+                Coordinate rootCoordinate = new Coordinate(lattitude, longitude);
+                regions = regions.stream().filter(region -> {
+                    return Util.getDistance(rootCoordinate, region.getCoordinate()) <= radius;
+                }).toList();
+            }
 
             regionDtos = regions.stream().map(RegionMapper::toRegionDtoForPage).toList();
             log.debug("RegionService::getRegionOptions received response from database {}", ValueMapper.jsonAsString(regionDtos));
@@ -149,12 +158,22 @@ public class RegionService {
             return exception(EntityType.REGION, ExceptionType.ENTITY_NOT_FOUND, id.toString());
         });
         regionDto = RegionMapper.toRegionDto(region);
+
         // region has category level >=4 then get weather for it
         if(region.getCategory().getLevel() >= 4) {
             WeatherDto weather = weatherService.getWeather(region.getCoordinate());
             regionDto.setWeather(weather);
         }
 
+        // get 3 nearest neighboring regions
+        List<Region> neighborRegions = regionRepository.findByCategoryId(region.getCategory().getId());
+        List<RegionDto> neighborRegionDtos = neighborRegions.stream()
+                .filter(neighborRegion -> !neighborRegion.getId().equals(region.getId()))
+                .sorted(Comparator.comparing(neighborRegion -> Util.getDistance(region.getCoordinate(), neighborRegion.getCoordinate())))
+                .map(RegionMapper::toRegionOptionDto)
+                .limit(3)
+                .toList();
+        regionDto.setNeighbors(neighborRegionDtos);
         log.debug("RegionService::getRegion received response from database {}", ValueMapper.jsonAsString(regionDto));
 
         log.info("RegionService::getRegion execution completed");

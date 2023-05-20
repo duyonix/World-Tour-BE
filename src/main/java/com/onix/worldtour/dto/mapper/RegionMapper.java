@@ -91,7 +91,9 @@ public class RegionMapper {
     public static RegionDto toRegionOptionDto(Region region) {
         return new RegionDto()
                 .setId(region.getId())
-                .setName(region.getName());
+                .setName(region.getName())
+                .setCommonName(region.getCommonName())
+                .setPicture(region.getPicture());
     }
 
     private static Integer getParendId(String subregion, List<Region> parentRegions) {
