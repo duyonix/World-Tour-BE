@@ -4,15 +4,13 @@ import com.onix.worldtour.controller.request.CountryRestData;
 import com.onix.worldtour.controller.request.RegionRequest;
 import com.onix.worldtour.dto.mapper.CountryMapper;
 import com.onix.worldtour.dto.mapper.RegionMapper;
+import com.onix.worldtour.dto.mapper.SceneSpotMapper;
 import com.onix.worldtour.dto.model.RegionDto;
 import com.onix.worldtour.dto.model.WeatherDto;
 import com.onix.worldtour.exception.ApplicationException;
 import com.onix.worldtour.exception.EntityType;
 import com.onix.worldtour.exception.ExceptionType;
-import com.onix.worldtour.model.Category;
-import com.onix.worldtour.model.Coordinate;
-import com.onix.worldtour.model.Country;
-import com.onix.worldtour.model.Region;
+import com.onix.worldtour.model.*;
 import com.onix.worldtour.repository.CategoryRepository;
 import com.onix.worldtour.repository.CountryRepository;
 import com.onix.worldtour.repository.RegionRepository;
@@ -95,6 +93,13 @@ public class RegionService {
                 country.setRegion(savedRegion);
                 Country savedCountry = countryRepository.save(country);
                 savedRegion.setCountry(savedCountry);
+            }
+
+            if(!regionRequest.getSceneSpots().isEmpty()) {
+                List<SceneSpot> sceneSpots = regionRequest.getSceneSpots().stream().map(SceneSpotMapper::toSceneSpot).toList();
+                sceneSpots.forEach(sceneSpot -> sceneSpot.setRegion(savedRegion));
+                List<SceneSpot> savedSceneSpots = sceneSpotRepository.saveAll(sceneSpots);
+                savedRegion.setSceneSpots(savedSceneSpots);
             }
 
             regionDto = RegionMapper.toRegionDto(savedRegion);
@@ -251,12 +256,33 @@ public class RegionService {
             log.debug("RegionService::updateRegion saving region to database {}", ValueMapper.jsonAsString(updatedRegion));
             Region savedRegion = regionRepository.save(updatedRegion);
 
+            //  update Country in Region
             if (country != null) {
                 country.setRegion(savedRegion);
                 Country savedCountry = countryRepository.save(country);
                 savedRegion.setCountry(savedCountry);
             }
 
+            // update SceneSpots in Region
+            List<SceneSpot> beforeSceneSpots = region.getSceneSpots() != null ? region.getSceneSpots() : new ArrayList<>();
+            List<SceneSpot> upsertSceneSpots = regionRequest.getSceneSpots() != null ? regionRequest.getSceneSpots().stream()
+                    .map(sceneSpotRequest -> SceneSpotMapper.toSceneSpot(sceneSpotRequest).setRegion(savedRegion))
+                    .toList() : new ArrayList<>();
+            List<SceneSpot> deleteSceneSpots = beforeSceneSpots.stream()
+                    .filter(beforeSceneSpot -> upsertSceneSpots.stream()
+                            .noneMatch(upsertSceneSpot -> upsertSceneSpot.getId().equals(beforeSceneSpot.getId())))
+                    .toList();
+
+            List<SceneSpot> savedSceneSpots = new ArrayList<>();
+            if (!upsertSceneSpots.isEmpty()) {
+                savedSceneSpots = sceneSpotRepository.saveAll(upsertSceneSpots);
+            }
+
+            if (!deleteSceneSpots.isEmpty()) {
+                sceneSpotRepository.deleteAll(deleteSceneSpots);
+            }
+
+//            savedRegion.setSceneSpots(savedSceneSpots);
             regionDto = RegionMapper.toRegionDto(savedRegion);
             log.debug("RegionService::updateRegion received response from database {}", ValueMapper.jsonAsString(regionDto));
         } catch (Exception e) {
@@ -288,6 +314,10 @@ public class RegionService {
             if (region.getCountry() != null) {
                 countryRepository.delete(region.getCountry());
             }
+            if(!region.getSceneSpots().isEmpty()) {
+                sceneSpotRepository.deleteAll(region.getSceneSpots());
+            }
+
             regionDto = RegionMapper.toRegionDto(region);
             regionRepository.delete(region);
             log.debug("RegionService::deleteRegion received response from database {}", ValueMapper.jsonAsString(regionDto));

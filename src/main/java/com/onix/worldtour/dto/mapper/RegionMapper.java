@@ -3,6 +3,7 @@ package com.onix.worldtour.dto.mapper;
 import com.onix.worldtour.controller.request.CountryRestData;
 import com.onix.worldtour.controller.request.RegionRequest;
 import com.onix.worldtour.dto.model.RegionDto;
+import com.onix.worldtour.dto.model.SceneSpotDto;
 import com.onix.worldtour.model.Category;
 import com.onix.worldtour.model.Coordinate;
 import com.onix.worldtour.model.Country;
@@ -46,7 +47,7 @@ public class RegionMapper {
         Region parent = region.getParent() != null ? region.getParent() : null;
         Country country = region.getCountry() != null ? region.getCountry() : null;
 
-        return new RegionDto()
+        RegionDto regionDto = new RegionDto()
                 .setId(region.getId())
                 .setName(region.getName())
                 .setCommonName(region.getCommonName())
@@ -63,6 +64,13 @@ public class RegionMapper {
                 .setReview(region.getReview())
                 .setCountryId(country != null ? country.getId() : null)
                 .setCountry(country != null ? CountryMapper.toCountryDto(country) : null);
+
+        List<SceneSpotDto> sceneSpotDtos = region.getSceneSpots().stream()
+                .map(SceneSpotMapper::toSceneSpotDto)
+                .collect(Collectors.toList());
+        regionDto.setSceneSpots(sceneSpotDtos);
+
+        return regionDto;
     }
 
     public static RegionDto toRegionDtoForPage(Region region) {
