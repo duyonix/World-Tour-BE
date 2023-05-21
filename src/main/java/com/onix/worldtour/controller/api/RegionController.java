@@ -84,6 +84,16 @@ public class RegionController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("/import-states")
+    public ResponseEntity<Response> importStates() {
+        log.info("RegionController::importStates");
+        regionService.importStates();
+
+        Response<Object> response = Response.ok();
+        log.info("RegionController::importStates response {}", ValueMapper.jsonAsString(response));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Response> updateRegion(@PathVariable("id") Integer id, @RequestBody @Valid RegionRequest regionRequest) {
         log.info("RegionController::updateRegion id {} request body {}", id, ValueMapper.jsonAsString(regionRequest));

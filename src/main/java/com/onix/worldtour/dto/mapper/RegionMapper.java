@@ -2,6 +2,7 @@ package com.onix.worldtour.dto.mapper;
 
 import com.onix.worldtour.controller.request.CountryRestData;
 import com.onix.worldtour.controller.request.RegionRequest;
+import com.onix.worldtour.controller.request.StateData;
 import com.onix.worldtour.dto.model.RegionDto;
 import com.onix.worldtour.dto.model.SceneSpotDto;
 import com.onix.worldtour.model.Category;
@@ -10,11 +11,14 @@ import com.onix.worldtour.model.Country;
 import com.onix.worldtour.model.Region;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class RegionMapper {
+    public static String defaultBackground = "https://storage.googleapis.com/onix-world-tour.appspot.com/dev/background/DefaultBackground.jpg";
+    public static String defaultPicture = "https://storage.googleapis.com/onix-world-tour.appspot.com/dev/picture/city.png";
+
     public static RegionRequest toRegionRequestForCountry(CountryRestData data, List<Region> parentRegions) {
-        String defaultBackground = "https://storage.googleapis.com/onix-world-tour.appspot.com/dev/background/DefaultBackground.jpg";
         return new RegionRequest()
                 .setName(data.getName().getOfficial())
                 .setCommonName(data.getName().getCommon())
@@ -27,7 +31,18 @@ public class RegionMapper {
                 .setPopulation(data.getPopulation())
                 .setArea(data.getArea())
                 .setCountry(CountryMapper.toCountryRequest(data))
-                .setParentId(getParendId(data.getSubregion(), parentRegions));
+                .setParentId(getParentIdForCountry(data.getSubregion(), parentRegions));
+    }
+
+    public static RegionRequest toRegionRequestForState(StateData data, Map<String, Integer> countryMapper) {
+        return new RegionRequest()
+                .setName(data.getName())
+                .setCommonName(data.getName())
+                .setPicture(defaultPicture)
+                .setBackgrounds(List.of(defaultBackground))
+                .setCoordinate(new Coordinate(Double.parseDouble(data.getLatitude()), Double.parseDouble(data.getLongitude())))
+                .setCategoryId(5)
+                .setParentId(countryMapper.get(data.getCountry_code()) != null ? countryMapper.get(data.getCountry_code()) : 211);
     }
 
     public static Region toRegion(RegionRequest regionRequest) {
@@ -65,10 +80,12 @@ public class RegionMapper {
                 .setCountryId(country != null ? country.getId() : null)
                 .setCountry(country != null ? CountryMapper.toCountryDto(country) : null);
 
-        List<SceneSpotDto> sceneSpotDtos = region.getSceneSpots().stream()
-                .map(SceneSpotMapper::toSceneSpotDto)
-                .collect(Collectors.toList());
-        regionDto.setSceneSpots(sceneSpotDtos);
+        if(region.getSceneSpots() != null && !region.getSceneSpots().isEmpty()) {
+            List<SceneSpotDto> sceneSpotDtos = region.getSceneSpots().stream()
+                    .map(SceneSpotMapper::toSceneSpotDto)
+                    .collect(Collectors.toList());
+            regionDto.setSceneSpots(sceneSpotDtos);
+        }
 
         return regionDto;
     }
@@ -96,7 +113,7 @@ public class RegionMapper {
                 .setPicture(region.getPicture());
     }
 
-    private static Integer getParendId(String subregion, List<Region> parentRegions) {
+    private static Integer getParentIdForCountry(String subregion, List<Region> parentRegions) {
         if (subregion == null) {
             subregion = "Antarctica";
         }
