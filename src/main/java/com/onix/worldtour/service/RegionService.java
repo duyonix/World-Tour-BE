@@ -1,7 +1,9 @@
 package com.onix.worldtour.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onix.worldtour.controller.request.CountryRestData;
 import com.onix.worldtour.controller.request.RegionRequest;
+import com.onix.worldtour.controller.request.StateData;
 import com.onix.worldtour.dto.mapper.CountryMapper;
 import com.onix.worldtour.dto.mapper.RegionMapper;
 import com.onix.worldtour.dto.mapper.SceneSpotMapper;
@@ -20,6 +22,7 @@ import com.onix.worldtour.util.ValueMapper;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,10 +31,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,11 +56,6 @@ public class RegionService {
     public RegionDto addRegion(RegionRequest regionRequest) {
         log.info("RegionService::addRegion execution started");
         RegionDto regionDto;
-
-        regionRepository.findByNameAndCategoryId(regionRequest.getName(), regionRequest.getCategoryId()).ifPresent(region -> {
-            log.error("RegionService::addRegion execution failed with duplicate name {} and category {}", regionRequest.getName(), regionRequest.getCategoryId());
-            throw exception(EntityType.REGION, ExceptionType.DUPLICATE_ENTITY, regionRequest.getName());
-        });
 
         Category category = categoryRepository.findById(regionRequest.getCategoryId()).orElseThrow(() -> {
             log.error("RegionService::addRegion execution failed with category not found {}", regionRequest.getCategoryId());
@@ -95,7 +90,7 @@ public class RegionService {
                 savedRegion.setCountry(savedCountry);
             }
 
-            if(!regionRequest.getSceneSpots().isEmpty()) {
+            if(regionRequest.getSceneSpots() != null && !regionRequest.getSceneSpots().isEmpty()) {
                 List<SceneSpot> sceneSpots = regionRequest.getSceneSpots().stream().map(SceneSpotMapper::toSceneSpot).toList();
                 sceneSpots.forEach(sceneSpot -> sceneSpot.setRegion(savedRegion));
                 List<SceneSpot> savedSceneSpots = sceneSpotRepository.saveAll(sceneSpots);
@@ -211,6 +206,32 @@ public class RegionService {
     }
 
     @Transactional
+    public void importStates() {
+        // import from states.json
+        log.info("RegionService::importStates execution started");
+        try {
+            ClassPathResource resource = new ClassPathResource("states.json");
+            ObjectMapper objectMapper = new ObjectMapper();
+            StateData[] stateDataArray = objectMapper.readValue(resource.getInputStream(), StateData[].class);
+            List<Region> countries = regionRepository.findByCategoryLevel(4); // get List of Regions has category level 4: Country
+
+            Map<String, Integer> countryMapper = countries.stream()
+                    .collect(Collectors.toMap(country -> country.getCountry().getCode(), Region::getId));
+            for (StateData stateData : stateDataArray) {
+                if (stateData.getCountry_code() != null && stateData.getName() != null &&
+                        stateData.getLatitude() != null && stateData.getLongitude() != null) {
+                    RegionRequest regionRequest = RegionMapper.toRegionRequestForState(stateData, countryMapper);
+                    addRegion(regionRequest);
+                }
+            }
+
+        } catch (Exception e) {
+            log.error("RegionService::importStates execution failed with error {}", e.getMessage());
+            throw exception(EntityType.REGION, ExceptionType.ENTITY_EXCEPTION, e.getMessage());
+        }
+    }
+
+    @Transactional
     public RegionDto updateRegion(Integer id, RegionRequest regionRequest) {
         log.info("RegionService::updateRegion execution started");
         RegionDto regionDto;
@@ -220,12 +241,6 @@ public class RegionService {
             log.error("RegionService::updateRegion execution failed with invalid region id {}", id);
             throw exception(EntityType.REGION, ExceptionType.ENTITY_NOT_FOUND, id.toString());
         });
-
-        Region duplicateRegion = regionRepository.findByNameAndCategoryId(regionRequest.getName(), regionRequest.getCategoryId()).orElse(null);
-        if (duplicateRegion != null && !duplicateRegion.getId().equals(id)) {
-            log.error("RegionService::updateRegion execution failed with duplicate region name {}", regionRequest.getName());
-            throw exception(EntityType.REGION, ExceptionType.DUPLICATE_ENTITY, regionRequest.getName());
-        }
 
         Category category = categoryRepository.findById(regionRequest.getCategoryId()).orElseThrow(() -> {
             log.error("RegionService::updateRegion execution failed with category not found {}", regionRequest.getCategoryId());
@@ -265,24 +280,36 @@ public class RegionService {
 
             // update SceneSpots in Region
             List<SceneSpot> beforeSceneSpots = region.getSceneSpots() != null ? region.getSceneSpots() : new ArrayList<>();
-            List<SceneSpot> upsertSceneSpots = regionRequest.getSceneSpots() != null ? regionRequest.getSceneSpots().stream()
-                    .map(sceneSpotRequest -> SceneSpotMapper.toSceneSpot(sceneSpotRequest).setRegion(savedRegion))
-                    .toList() : new ArrayList<>();
-            List<SceneSpot> deleteSceneSpots = beforeSceneSpots.stream()
-                    .filter(beforeSceneSpot -> upsertSceneSpots.stream()
-                            .noneMatch(upsertSceneSpot -> upsertSceneSpot.getId().equals(beforeSceneSpot.getId())))
-                    .toList();
+            // filter addSceneSpots (id == null) and updateSceneSpots (id != null), deleteSceneSpots (have in beforeSceneSpots but not in updateSceneSpots)
+            List<SceneSpot> addSceneSpots = regionRequest.getSceneSpots().stream().filter(sceneSpotRequest -> sceneSpotRequest.getId() == null).map(SceneSpotMapper::toSceneSpot).toList();
+            List<SceneSpot> updateSceneSpots = regionRequest.getSceneSpots().stream().filter(sceneSpotRequest -> sceneSpotRequest.getId() != null).map(SceneSpotMapper::toSceneSpot).toList();
+            List<SceneSpot> deleteSceneSpots = beforeSceneSpots.stream().filter(beforeSceneSpot -> updateSceneSpots.stream().noneMatch(updateSceneSpot -> updateSceneSpot.getId().equals(beforeSceneSpot.getId()))).toList();
 
-            List<SceneSpot> savedSceneSpots = new ArrayList<>();
-            if (!upsertSceneSpots.isEmpty()) {
-                savedSceneSpots = sceneSpotRepository.saveAll(upsertSceneSpots);
+            // add new SceneSpots
+            if (!addSceneSpots.isEmpty()) {
+                addSceneSpots.forEach(sceneSpot -> sceneSpot.setRegion(savedRegion));
+                List<SceneSpot> savedSceneSpots = sceneSpotRepository.saveAll(addSceneSpots);
+                savedRegion.getSceneSpots().addAll(savedSceneSpots);
             }
 
+            // update SceneSpots
+            for (SceneSpot updateSceneSpot : updateSceneSpots) {
+                SceneSpot beforeSceneSpot = beforeSceneSpots.stream().filter(sceneSpot -> sceneSpot.getId().equals(updateSceneSpot.getId())).findFirst().orElseThrow(() -> {
+                    log.error("RegionService::updateRegion execution failed with scene spot not found {}", updateSceneSpot.getId());
+                    throw exception(EntityType.SCENE_SPOT, ExceptionType.ENTITY_NOT_FOUND, updateSceneSpot.getId().toString());
+                });
+                updateSceneSpot.setRegion(savedRegion);
+                SceneSpot savedSceneSpot = sceneSpotRepository.save(updateSceneSpot);
+                savedRegion.getSceneSpots().remove(beforeSceneSpot);
+                savedRegion.getSceneSpots().add(savedSceneSpot);
+            }
+
+            // delete SceneSpots
             if (!deleteSceneSpots.isEmpty()) {
                 sceneSpotRepository.deleteAll(deleteSceneSpots);
+                savedRegion.getSceneSpots().removeAll(deleteSceneSpots);
             }
 
-//            savedRegion.setSceneSpots(savedSceneSpots);
             regionDto = RegionMapper.toRegionDto(savedRegion);
             log.debug("RegionService::updateRegion received response from database {}", ValueMapper.jsonAsString(regionDto));
         } catch (Exception e) {
