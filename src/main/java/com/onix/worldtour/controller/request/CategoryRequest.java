@@ -20,5 +20,8 @@ public class CategoryRequest {
     @NotNull(message = "Level is required")
     private Integer level;
 
+    @NotNull(message = "Picture is required")
+    private String picture;
+
     private String description;
 }
