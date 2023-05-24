@@ -53,6 +53,13 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
         return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(ApplicationException.DuplicateLevelException.class)
+    public final ResponseEntity handleDuplicateLevelException(Exception ex, WebRequest request) {
+        Response<Object> response = Response.duplicateLevel();
+        response.addErrorMsgToResponse(ex.getMessage(), ex);
+        return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public final ResponseEntity handleAllExceptions(Exception ex, WebRequest request) {
         Response<Object> response = Response.exception();

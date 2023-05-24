@@ -37,6 +37,12 @@ public class CategoryService {
             throw exception(EntityType.CATEGORY, ExceptionType.DUPLICATE_ENTITY, categoryRequest.getName());
         }
 
+        category = categoryRepository.findByLevel(categoryRequest.getLevel());
+        if (category.isPresent()) {
+            log.error("CategoryService::addCategory execution failed with duplicate category level {}", categoryRequest.getLevel());
+            throw exception(EntityType.CATEGORY, ExceptionType.DUPLICATE_LEVEL, categoryRequest.getLevel().toString());
+        }
+
         try {
             Category newCategory = CategoryMapper.toCategory(categoryRequest);
             log.debug("CategoryService::addCategory request parameters {}", ValueMapper.jsonAsString(newCategory));
@@ -125,9 +131,16 @@ public class CategoryService {
             throw exception(EntityType.CATEGORY, ExceptionType.DUPLICATE_ENTITY, categoryRequest.getName());
         }
 
+        duplicateCategory = categoryRepository.findByLevel(categoryRequest.getLevel());
+        if (duplicateCategory.isPresent() && !duplicateCategory.get().getId().equals(category.get().getId())) {
+            log.error("CategoryService::updateCategory execution failed with duplicate category level {}", categoryRequest.getLevel());
+            throw exception(EntityType.CATEGORY, ExceptionType.DUPLICATE_LEVEL, categoryRequest.getLevel().toString());
+        }
+
         try {
             Category updatedCategory = CategoryMapper.toCategory(categoryRequest);
-            updatedCategory.setId(category.get().getId());
+            updatedCategory.setId(category.get().getId())
+                           .setRegions(category.get().getRegions());
             log.debug("CategoryService::updateCategory request parameters {}", ValueMapper.jsonAsString(updatedCategory));
 
             Category savedCategory = categoryRepository.save(updatedCategory);
