@@ -27,6 +27,8 @@ public class Category {
 
     @Column(name = "level", nullable = false, columnDefinition = "INTEGER")
     private Integer level;
+    @Column(name = "picture", columnDefinition = "TEXT")
+    private String picture;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;

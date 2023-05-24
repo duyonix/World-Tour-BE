@@ -9,6 +9,7 @@ public class CategoryMapper {
         return new Category()
                 .setName(categoryRequest.getName())
                 .setLevel(categoryRequest.getLevel())
+                .setPicture(categoryRequest.getPicture())
                 .setDescription(categoryRequest.getDescription());
     }
 
@@ -17,6 +18,7 @@ public class CategoryMapper {
                 .setId(category.getId())
                 .setName(category.getName())
                 .setLevel(category.getLevel())
+                .setPicture(category.getPicture())
                 .setDescription(category.getDescription());
     }
 

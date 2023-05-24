@@ -20,5 +20,7 @@ public class CategoryDto {
 
     private Integer level;
 
+    private String picture;
+
     private String description;
 }
