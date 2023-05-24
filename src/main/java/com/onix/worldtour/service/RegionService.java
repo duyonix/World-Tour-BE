@@ -169,7 +169,7 @@ public class RegionService {
         }
 
         // get 3 nearest neighboring regions
-        List<Region> neighborRegions = regionRepository.findByCategoryId(region.getCategory().getId());
+        List<Region> neighborRegions = regionRepository.findByCategoryIdAndParentId(region.getCategory().getId(), region.getParent().getId());
         List<RegionDto> neighborRegionDtos = neighborRegions.stream()
                 .filter(neighborRegion -> !neighborRegion.getId().equals(region.getId()))
                 .sorted(Comparator.comparing(neighborRegion -> Util.getDistance(region.getCoordinate(), neighborRegion.getCoordinate())))
