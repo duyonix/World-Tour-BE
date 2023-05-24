@@ -14,11 +14,12 @@ public interface RegionRepository extends JpaRepository<Region, Integer> {
     Optional<Region> findByName(String name);
 
     @Query(value = """
-        SELECT s FROM Region s\s
-        WHERE lower(s.name) LIKE lower(concat('%', :name, '%')) AND
-        (:categoryId IS NULL OR s.category.id = :categoryId) AND
-        (:parentId IS NULL OR s.parent.id = :parentId)
-        """)
+            SELECT s FROM Region s\s
+            WHERE (lower(s.name) LIKE lower(concat('%', :name, '%')) OR
+                lower(s.commonName) LIKE lower(concat('%', :name, '%'))) AND
+            (:categoryId IS NULL OR s.category.id = :categoryId) AND
+            (:parentId IS NULL OR s.parent.id = :parentId)
+            """)
     Page<Region> findByNameContainingAndCategoryIdAndParentId(@Param("name") String name,
                                                               @Param("categoryId") Integer categoryId,
                                                               @Param("parentId") Integer parentId,
@@ -27,10 +28,11 @@ public interface RegionRepository extends JpaRepository<Region, Integer> {
     List<Region> findByNameContaining(String name);
 
     @Query(value = """
-        SELECT s FROM Region s\s
-        WHERE lower(s.name) LIKE lower(concat('%', :name, '%')) AND
-        (:level IS NULL OR s.category.level = :level)
-        """)
+            SELECT s FROM Region s\s
+            WHERE (lower(s.name) LIKE lower(concat('%', :name, '%')) OR
+                lower(s.commonName) LIKE lower(concat('%', :name, '%'))) AND
+            (:level IS NULL OR s.category.level = :level)
+            """)
     List<Region> findByNameContainingAndCategoryLevel(@Param("name") String name, @Param("level") Integer level);
 
     List<Region> findByCategoryLevel(Integer level);

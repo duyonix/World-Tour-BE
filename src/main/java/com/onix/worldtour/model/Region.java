@@ -11,7 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity(name = "Region")
-@Table(name = "region")
+@Table(name = "region", indexes = {
+        @Index(name = "region_name_index", columnList = "name"),
+        @Index(name = "region_common_name_index", columnList = "commonName")
+})
 @Data
 @Accessors(chain = true)
 @AllArgsConstructor

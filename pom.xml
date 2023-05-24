@@ -105,6 +105,27 @@
 			<artifactId>jackson-datatype-jsr310</artifactId>
 			<version>2.13.4</version>
 		</dependency>
+		<!-- Hibernate Search -->
+<!--		<dependency>-->
+<!--			<groupId>org.hibernate</groupId>-->
+<!--			<artifactId>hibernate-search-orm</artifactId>-->
+<!--			<version>5.11.5.Final</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>org.hibernate</groupId>-->
+<!--			<artifactId>hibernate-search-engine</artifactId>-->
+<!--			<version>5.11.5.Final</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>org.apache.lucene</groupId>-->
+<!--			<artifactId>lucene-core</artifactId>-->
+<!--			<version>4.10.4</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>org.apache.lucene</groupId>-->
+<!--			<artifactId>lucene-analyzers-common</artifactId>-->
+<!--			<version>4.10.4</version>-->
+<!--		</dependency>-->
 	</dependencies>
 
 	<build>
