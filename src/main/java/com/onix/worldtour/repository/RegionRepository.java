@@ -37,7 +37,5 @@ public interface RegionRepository extends JpaRepository<Region, Integer> {
 
     List<Region> findByCategoryLevel(Integer level);
 
-    Optional<Region> findByNameAndCategoryId(String name, Integer categoryId);
-
-    List<Region> findByCategoryId(Integer id);
+    List<Region> findByCategoryIdAndParentId(Integer categoryId, Integer parentId);
 }
