@@ -91,6 +91,12 @@ public class Response<T> {
         return response;
     }
 
+    public static <T> Response<T> duplicateLevel() {
+        Response<T> response = new Response<>();
+        response.setStatus(Status.DUPLICATE_LEVEL);
+        return response;
+    }
+
     public void addErrorMsgToResponse(String errorMsg, Exception ex) {
         ResponseError error = new ResponseError()
                 .setDetails(errorMsg)
@@ -111,7 +117,8 @@ public class Response<T> {
         DUPLICATE_ENTITY,
         ALREADY_USED_ELSEWHERE,
         ARGUMENT_NOT_VALID,
-        NOT_MATCH
+        NOT_MATCH,
+        DUPLICATE_LEVEL
     }
 
     @Data

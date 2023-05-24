@@ -51,12 +51,14 @@ public class Region {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "regions"})
     private Category category;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "children", "category"})
     private Region parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Transient
     private List<Region> children = new ArrayList<>();
 
     @Column(name = "review", columnDefinition = "TEXT")

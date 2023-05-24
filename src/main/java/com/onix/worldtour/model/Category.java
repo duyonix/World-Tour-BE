@@ -25,8 +25,9 @@ public class Category {
     @Column(name = "name", nullable = false, columnDefinition = "TEXT")
     private String name;
 
-    @Column(name = "level", nullable = false, columnDefinition = "INTEGER")
+    @Column(name = "level", nullable = false, unique = true, columnDefinition = "INTEGER")
     private Integer level;
+
     @Column(name = "picture", columnDefinition = "TEXT")
     private String picture;
 
@@ -34,5 +35,6 @@ public class Category {
     private String description;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Transient
     private List<Region> regions = new ArrayList<>();
 }

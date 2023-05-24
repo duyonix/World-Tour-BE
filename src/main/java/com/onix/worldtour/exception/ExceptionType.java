@@ -5,6 +5,7 @@ public enum ExceptionType {
     DUPLICATE_ENTITY("duplicate"),
     ALREADY_USED_ELSEWHERE("used.elsewhere"),
     NOT_MATCH("not.match"),
+    DUPLICATE_LEVEL("duplicate.level"),
     ENTITY_EXCEPTION("exception");
 
 
