@@ -135,9 +135,7 @@ public class RegionService {
             List<Region> regions = regionRepository.findByNameContainingAndCategoryLevel(search, level);
             if(lattitude != null && longitude != null && radius != null) {
                 Coordinate rootCoordinate = new Coordinate(lattitude, longitude);
-                regions = regions.stream().filter(region -> {
-                    return Util.getDistance(rootCoordinate, region.getCoordinate()) <= radius;
-                }).toList();
+                regions = regions.stream().filter(region -> Util.getDistance(rootCoordinate, region.getCoordinate()) <= radius).toList();
             }
 
             regionDtos = regions.stream().map(RegionMapper::toRegionDtoForPage).toList();
@@ -169,7 +167,10 @@ public class RegionService {
         }
 
         // get 3 nearest neighboring regions
-        List<Region> neighborRegions = regionRepository.findByCategoryIdAndParentId(region.getCategory().getId(), region.getParent().getId());
+        List<Region> neighborRegions = new ArrayList<>();
+        if(region.getCategory().getLevel() != 1 && region.getParent() != null) {
+            neighborRegions = regionRepository.findByCategoryIdAndParentId(region.getCategory().getId(), region.getParent().getId());
+        }
         List<RegionDto> neighborRegionDtos = neighborRegions.stream()
                 .filter(neighborRegion -> !neighborRegion.getId().equals(region.getId()))
                 .sorted(Comparator.comparing(neighborRegion -> Util.getDistance(region.getCoordinate(), neighborRegion.getCoordinate())))
