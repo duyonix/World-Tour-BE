@@ -401,10 +401,10 @@ public class RegionService {
 
     private String getRegionPath(Region region) {
         List<String> path = new ArrayList<>();
-        path.add(region.getCommonName());
+        path.add(region.getName());
         Region parent = region.getParent();
         while (parent != null) {
-            path.add(parent.getCommonName());
+            path.add(parent.getName());
             parent = parent.getParent();
         }
         Collections.reverse(path);
