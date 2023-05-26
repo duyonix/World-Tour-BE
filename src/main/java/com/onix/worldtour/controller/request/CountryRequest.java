@@ -18,15 +18,11 @@ public class CountryRequest {
     @NotBlank(message = "Code is required")
     private String code;
 
-    @NotBlank(message = "Capital is required")
     private String capital;
 
-    @NotBlank(message = "Language is required")
     private String language;
 
-    @NotBlank(message = "Currency is required")
     private String currency;
 
-    @NotBlank(message = "Timezone is required")
     private String timezone;
 }
