@@ -187,6 +187,7 @@ public class RegionService {
                 .limit(3)
                 .toList();
         regionDto.setNeighbors(neighborRegionDtos);
+        regionDto.setPath(getRegionPath(region));
         log.debug("RegionService::getRegion received response from database {}", ValueMapper.jsonAsString(regionDto));
 
         log.info("RegionService::getRegion execution completed");
