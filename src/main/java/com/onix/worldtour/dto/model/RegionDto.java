@@ -57,4 +57,6 @@ public class RegionDto {
     private WeatherDto weather;
 
     private List<RegionDto> neighbors;
+
+    private String path;
 }
