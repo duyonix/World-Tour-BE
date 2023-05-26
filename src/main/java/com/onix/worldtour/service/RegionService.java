@@ -57,6 +57,11 @@ public class RegionService {
         log.info("RegionService::addRegion execution started");
         RegionDto regionDto;
 
+        regionRepository.findByNameOrCommonNameAndCategoryIdAndParentId(regionRequest.getName(), regionRequest.getCommonName(), regionRequest.getCategoryId(), regionRequest.getParentId()).ifPresent(region -> {
+            log.error("RegionService::addRegion execution failed with region already exists {}", regionRequest.getName());
+            throw exception(EntityType.REGION, ExceptionType.DUPLICATE_ENTITY, regionRequest.getName() + " or " + regionRequest.getCommonName());
+        });
+
         Category category = categoryRepository.findById(regionRequest.getCategoryId()).orElseThrow(() -> {
             log.error("RegionService::addRegion execution failed with category not found {}", regionRequest.getCategoryId());
             throw exception(EntityType.CATEGORY, ExceptionType.ENTITY_NOT_FOUND, regionRequest.getCategoryId().toString());
@@ -259,6 +264,14 @@ public class RegionService {
             log.error("RegionService::updateRegion execution failed with invalid region id {}", id);
             throw exception(EntityType.REGION, ExceptionType.ENTITY_NOT_FOUND, id.toString());
         });
+
+        regionRepository.findByNameOrCommonNameAndCategoryIdAndParentId(regionRequest.getName(), regionRequest.getCommonName(), regionRequest.getCategoryId(), regionRequest.getParentId())
+                .ifPresent(duplicateRegion -> {
+                    if(!duplicateRegion.getId().equals(id)) {
+                        log.error("RegionService::updateRegion execution failed with duplicate region name {} or common name {} for category {}", regionRequest.getName(), regionRequest.getCommonName(), regionRequest.getCategoryId());
+                        throw exception(EntityType.REGION, ExceptionType.DUPLICATE_ENTITY, regionRequest.getName() + " or " + regionRequest.getCommonName());
+                    }
+                });
 
         Category category = categoryRepository.findById(regionRequest.getCategoryId()).orElseThrow(() -> {
             log.error("RegionService::updateRegion execution failed with category not found {}", regionRequest.getCategoryId());

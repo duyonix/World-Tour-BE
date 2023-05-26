@@ -38,4 +38,17 @@ public interface RegionRepository extends JpaRepository<Region, Integer> {
     List<Region> findByCategoryLevel(Integer level);
 
     List<Region> findByCategoryIdAndParentId(Integer categoryId, Integer parentId);
+
+    @Query(value = """
+            SELECT r FROM Region r\s
+            WHERE (r.name = :name OR r.commonName = :commonName) AND\s
+            r.category.id = :categoryId AND\s
+            r.parent.id = :parentId
+            """)
+    Optional<Region> findByNameOrCommonNameAndCategoryIdAndParentId(
+            @Param("name") String name,
+            @Param("commonName") String commonName,
+            @Param("categoryId") Integer categoryId,
+            @Param("parentId") Integer parentId
+    );
 }
