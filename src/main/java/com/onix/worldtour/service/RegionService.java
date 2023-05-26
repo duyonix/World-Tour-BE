@@ -139,6 +139,15 @@ public class RegionService {
             }
 
             regionDtos = regions.stream().map(RegionMapper::toRegionDtoForPage).toList();
+
+            List<Region> finalRegions = regions;
+            regionDtos.forEach(regionDto -> {
+                Region region = finalRegions.stream().filter(r -> r.getId().equals(regionDto.getId())).findFirst().orElse(null);
+                if(region != null) {
+                    String path = getRegionPath(region);
+                    regionDto.setPath(path);
+                }
+            });
             log.debug("RegionService::getRegionOptions received response from database {}", ValueMapper.jsonAsString(regionDtos));
         } catch (Exception e) {
             log.error("RegionService::getRegionOptions execution failed with error {}", e.getMessage());
@@ -387,6 +396,18 @@ public class RegionService {
 
         log.info("RegionService::getAncestorRegions execution completed");
         return regionDtos;
+    }
+
+    private String getRegionPath(Region region) {
+        List<String> path = new ArrayList<>();
+        path.add(region.getCommonName());
+        Region parent = region.getParent();
+        while (parent != null) {
+            path.add(parent.getCommonName());
+            parent = parent.getParent();
+        }
+        Collections.reverse(path);
+        return String.join("/", path);
     }
 
     private RuntimeException exception(EntityType entityType, ExceptionType exceptionType, String... args) {
