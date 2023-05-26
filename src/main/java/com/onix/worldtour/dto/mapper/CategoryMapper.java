@@ -25,6 +25,7 @@ public class CategoryMapper {
     public static CategoryDto toCategoryOptionDto(Category category) {
         return new CategoryDto()
                 .setId(category.getId())
-                .setName(category.getName());
+                .setName(category.getName())
+                .setLevel(category.getLevel());
     }
 }
