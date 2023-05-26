@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,7 +86,7 @@ public class CategoryService {
         try {
             List<Category> categories = categoryRepository.findAll();
 
-            categoryDtos = categories.stream().map(CategoryMapper::toCategoryOptionDto).toList();
+            categoryDtos = categories.stream().map(CategoryMapper::toCategoryOptionDto).sorted(Comparator.comparing(CategoryDto::getLevel)).toList();
             log.debug("CategoryService::getCategoryOptions received response from database {}", ValueMapper.jsonAsString(categoryDtos));
         } catch (Exception e) {
             log.error("CategoryService::getCategoryOptions execution failed with error {}", e.getMessage());
