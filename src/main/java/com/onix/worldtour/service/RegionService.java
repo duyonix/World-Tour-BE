@@ -117,6 +117,13 @@ public class RegionService {
             Page<Region> regions = regionRepository.findByNameContainingAndCategoryIdAndParentId(search, categoryId, parentId, pageable);
 
             regionDtos = regions.map(RegionMapper::toRegionDtoForPage);
+            regionDtos.forEach(regionDto -> {
+                Region region = regions.stream().filter(r -> r.getId().equals(regionDto.getId())).findFirst().orElse(null);
+                if(region != null) {
+                    String path = getRegionPath(region);
+                    regionDto.setPath(path);
+                }
+            });
             log.debug("RegionService::getRegions received response from database {}", ValueMapper.jsonAsString(regionDtos));
         } catch (Exception e) {
             log.error("RegionService::getRegions execution failed with error {}", e.getMessage());
@@ -408,7 +415,7 @@ public class RegionService {
             parent = parent.getParent();
         }
         Collections.reverse(path);
-        return String.join("/", path);
+        return String.join(" / ", path);
     }
 
     private RuntimeException exception(EntityType entityType, ExceptionType exceptionType, String... args) {
