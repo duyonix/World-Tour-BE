@@ -54,10 +54,10 @@ public class RegionController {
         @RequestParam(value = "level", required = false) Integer level,
         @RequestParam(value = "lattitude", required = false) Double lattitude,
         @RequestParam(value = "longitude", required = false) Double longitude,
-        @RequestParam(value = "radius", required = false) Double radius
+        @RequestParam(value = "distance", required = false) Double distance
     ) {
-        log.info("RegionController::getRegionOptions search {} level {} lattitude {} longitude {} radius {}", search, level, lattitude, longitude, radius);
-        List<RegionDto> regions = regionService.getRegionOptions(search, level, lattitude, longitude, radius);
+        log.info("RegionController::getRegionOptions search {} level {} lattitude {} longitude {} distance {}", search, level, lattitude, longitude, distance);
+        List<RegionDto> regions = regionService.getRegionOptions(search, level, lattitude, longitude, distance);
 
         Response<Object> response = Response.ok().setPayload(regions);
         log.info("RegionController::getRegionOptions response {}", ValueMapper.jsonAsString(response));

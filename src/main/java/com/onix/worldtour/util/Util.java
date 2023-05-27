@@ -9,6 +9,7 @@ import java.util.TimeZone;
 public class Util {
     private static final double EARTH_RADIUS = 6371.0; // Earth's mean radius in kilometers
 
+    // https://www.geeksforgeeks.org/haversine-formula-to-find-distance-between-two-points-on-a-sphere/
     public static double getDistance(Coordinate x, Coordinate y) {
         double lat1 = Math.toRadians(x.getLattitude());
         double lon1 = Math.toRadians(x.getLongitude());
@@ -27,6 +28,14 @@ public class Util {
         double distance = EARTH_RADIUS * c;
 
         return distance;
+    }
+
+    public static double calculateLatitudeDelta(double distance) {
+        return Math.toDegrees(distance / EARTH_RADIUS);
+    }
+
+    public static double calculateLongitudeDelta(double distance, double latitude) {
+        return Math.toDegrees(distance / (EARTH_RADIUS * Math.cos(Math.toRadians(latitude))));
     }
 
     public static LocalDateTime convertTimestampToDateTime(Long timestamp) {
