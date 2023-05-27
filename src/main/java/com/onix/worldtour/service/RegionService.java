@@ -52,6 +52,9 @@ public class RegionService {
     @Autowired
     private WeatherService weatherService;
 
+    @Autowired
+    private ReviewService reviewService;
+
     @Transactional
     public RegionDto addRegion(RegionRequest regionRequest) {
         log.info("RegionService::addRegion execution started");
@@ -185,6 +188,12 @@ public class RegionService {
         if(region.getCategory().getLevel() >= 4) {
             WeatherDto weather = weatherService.getWeather(region.getCoordinate());
             regionDto.setWeather(weather);
+        }
+
+        // get infoReview for region
+        if(region.getReview() != null) {
+            Object infoReview = reviewService.getVideoData(region.getReview());
+            regionDto.setReviewInfo(infoReview);
         }
 
         // get 3 nearest neighboring regions
