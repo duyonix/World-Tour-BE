@@ -1,9 +1,15 @@
 package com.onix.worldtour.service;
 
+import com.onix.worldtour.exception.ApplicationException;
+import com.onix.worldtour.exception.EntityType;
+import com.onix.worldtour.exception.ExceptionType;
+import com.onix.worldtour.util.ValueMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
+@Slf4j
 public class ReviewService {
 
     private static final String API_ENDPOINT = "https://www.googleapis.com/youtube/v3/videos";
@@ -15,14 +21,25 @@ public class ReviewService {
         this.restTemplate = new RestTemplate();
     }
 
-    public Object getVideoData(String youtubeLink) {
-        String videoId = extractVideoId(youtubeLink);
-        if(videoId == null) {
-            return null;
+    public Object getVideoData(String url) {
+        log.info("ReviewService::getVideoData execution started");
+        Object data = null;
+        try {
+            log.debug("ReviewService::getVideoData url {}", url);
+            String videoId = extractVideoId(url);
+            if (videoId == null) {
+                return null;
+            }
+
+            String apiUrl = buildApiUrl(videoId);
+            data = restTemplate.getForObject(apiUrl, Object.class);
+            log.debug("ReviewService::getVideoData received response {}", ValueMapper.jsonAsString(data));
+        } catch (Exception e) {
+            log.error("ReviewService::getVideoData error {}", e.getMessage());
+            throw exception(EntityType.REVIEW, ExceptionType.ENTITY_EXCEPTION, url);
         }
 
-        String apiUrl = buildApiUrl(videoId);
-        Object data = restTemplate.getForObject(apiUrl, Object.class);
+        log.info("ReviewService::getVideoData execution completed");
         return data;
     }
 
@@ -52,5 +69,9 @@ public class ReviewService {
         } else {
             return null;
         }
+    }
+
+    private RuntimeException exception(EntityType entityType, ExceptionType exceptionType, String... args) {
+        return ApplicationException.throwException(entityType, exceptionType, args);
     }
 }
