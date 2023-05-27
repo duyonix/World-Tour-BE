@@ -122,7 +122,7 @@ public class RegionService {
         try {
             log.debug("RegionService::getRegions request parameters page {}, size {}, search {}, categoryId {}, parentId {}", page, size, search, categoryId, parentId);
             Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
-            Page<Region> regions = regionRepository.findByNameContainingAndCategoryIdAndParentId(search, categoryId, parentId, pageable);
+            Page<Region> regions = regionRepository.findBySearchAndCategoryIdAndParentId(search, categoryId, parentId, pageable);
 
             regionDtos = regions.map(RegionMapper::toRegionDtoForPage);
             regionDtos.forEach(regionDto -> {
@@ -142,15 +142,24 @@ public class RegionService {
         return regionDtos;
     }
 
-    public List<RegionDto> getRegionOptions(String search, Integer level, Double lattitude, Double longitude, Double radius) {
+    public List<RegionDto> getRegionOptions(String search, Integer level, Double lattitude, Double longitude, Double distance) {
         log.info("RegionService::getRegionOptions execution started");
         List<RegionDto> regionDtos;
         try {
-            log.debug("RegionService::getRegionOptions request parameters search {}, level {}, lattitude {}, longitude {}, radius {}", search, level, lattitude, longitude, radius);
-            List<Region> regions = regionRepository.findByNameContainingAndCategoryLevel(search, level);
-            if(lattitude != null && longitude != null && radius != null) {
-                Coordinate rootCoordinate = new Coordinate(lattitude, longitude);
-                regions = regions.stream().filter(region -> Util.getDistance(rootCoordinate, region.getCoordinate()) <= radius).toList();
+            log.debug("RegionService::getRegionOptions request parameters search {}, level {}, lattitude {}, longitude {}, distance {}", search, level, lattitude, longitude, distance);
+            List<Region> regions = new ArrayList<>();
+            if(lattitude != null && longitude != null && distance != null) {
+                double lattitudeDelta = Util.calculateLatitudeDelta(distance);
+                double longitudeDelta = Util.calculateLongitudeDelta(distance, lattitude);
+
+                double minLattitude = lattitude - lattitudeDelta;
+                double maxLattitude = lattitude + lattitudeDelta;
+                double minLongitude = longitude - longitudeDelta;
+                double maxLongitude = longitude + longitudeDelta;
+
+                regions = regionRepository.findBySearchAndCategoryLevelAndWithinBounds(search, level, minLattitude, maxLattitude, minLongitude, maxLongitude);
+            } else {
+                regions = regionRepository.findBySearchAndCategoryLevel(search, level);
             }
 
             regionDtos = regions.stream().map(RegionMapper::toRegionDtoForPage).toList();
