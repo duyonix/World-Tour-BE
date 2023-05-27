@@ -42,6 +42,8 @@ public class RegionDto {
 
     private String review;
 
+    private Object reviewInfo;
+
     private Long population;
 
     private Double area;
