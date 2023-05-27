@@ -8,6 +8,8 @@ public enum EntityType {
     COUNTRY("country"),
     SCENE_SPOT("scene_spot"),
     COSTUME("costume"),
+    WEATHER("weather"),
+    REVIEW("review"),
     ;
 
     private final String value;
