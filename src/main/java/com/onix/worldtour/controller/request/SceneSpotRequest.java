@@ -23,6 +23,5 @@ public class SceneSpotRequest {
     @NotBlank(message = "Picture is required")
     private String picture;
 
-    @NotBlank(message = "Review is required")
     private String review;
 }
