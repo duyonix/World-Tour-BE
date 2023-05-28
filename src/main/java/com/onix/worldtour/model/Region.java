@@ -79,14 +79,4 @@ public class Region {
 
     @OneToMany(mappedBy = "region", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SceneSpot> sceneSpots;
-
-    public void addChild(Region child) {
-        children.add(child);
-        child.setParent(this);
-    }
-
-    public void removeChild(Region child) {
-        children.remove(child);
-        child.setParent(null);
-    }
 }

@@ -194,6 +194,10 @@ public class RegionService {
             regionDto.setReviewInfo(infoReview);
         }
 
+        // has children
+        List<Region> chilrenRegions = regionRepository.findByParentId(region.getId());
+        regionDto.setHasChildren(!chilrenRegions.isEmpty());
+
         // get 3 nearest neighboring regions
         List<Region> neighborRegions = new ArrayList<>();
         if(region.getCategory().getLevel() != 1 && region.getParent() != null) {

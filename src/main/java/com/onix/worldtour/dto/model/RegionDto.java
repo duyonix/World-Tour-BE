@@ -61,4 +61,6 @@ public class RegionDto {
     private List<RegionDto> neighbors;
 
     private String path;
+
+    private Boolean hasChildren;
 }
