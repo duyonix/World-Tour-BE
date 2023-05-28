@@ -77,6 +77,7 @@ public class RegionService {
                 throw exception(EntityType.PARENT_REGION, ExceptionType.ENTITY_NOT_FOUND, regionRequest.getParentId().toString());
             });
         }
+        checkParentIsSuitable(parent, category);
 
         if (category.getLevel() == 4 && regionRequest.getCountry() == null) {
             log.error("RegionService::addRegion execution failed with invalid country for category level Country");
@@ -125,13 +126,7 @@ public class RegionService {
             Page<Region> regions = regionRepository.findBySearchAndCategoryIdAndParentId(search, categoryId, parentId, pageable);
 
             regionDtos = regions.map(RegionMapper::toRegionDtoForPage);
-            regionDtos.forEach(regionDto -> {
-                Region region = regions.stream().filter(r -> r.getId().equals(regionDto.getId())).findFirst().orElse(null);
-                if(region != null) {
-                    String path = getRegionPath(region);
-                    regionDto.setPath(path);
-                }
-            });
+            mapListRegionDtoWithPath(regionDtos.getContent(), regions.getContent());
             log.debug("RegionService::getRegions received response from database {}", ValueMapper.jsonAsString(regionDtos));
         } catch (Exception e) {
             log.error("RegionService::getRegions execution failed with error {}", e.getMessage());
@@ -147,7 +142,7 @@ public class RegionService {
         List<RegionDto> regionDtos;
         try {
             log.debug("RegionService::getRegionOptions request parameters search {}, level {}, lattitude {}, longitude {}, distance {}", search, level, lattitude, longitude, distance);
-            List<Region> regions = new ArrayList<>();
+            List<Region> regions;
             if(lattitude != null && longitude != null && distance != null) {
                 double lattitudeDelta = Util.calculateLatitudeDelta(distance);
                 double longitudeDelta = Util.calculateLongitudeDelta(distance, lattitude);
@@ -165,13 +160,7 @@ public class RegionService {
             regionDtos = regions.stream().map(RegionMapper::toRegionDtoForPage).toList();
 
             List<Region> finalRegions = regions;
-            regionDtos.forEach(regionDto -> {
-                Region region = finalRegions.stream().filter(r -> r.getId().equals(regionDto.getId())).findFirst().orElse(null);
-                if(region != null) {
-                    String path = getRegionPath(region);
-                    regionDto.setPath(path);
-                }
-            });
+            mapListRegionDtoWithPath(regionDtos, finalRegions);
             log.debug("RegionService::getRegionOptions received response from database {}", ValueMapper.jsonAsString(regionDtos));
         } catch (Exception e) {
             log.error("RegionService::getRegionOptions execution failed with error {}", e.getMessage());
@@ -236,9 +225,11 @@ public class RegionService {
             // get List of Regions has category level 3: Region
             List<Region> parentRegions = regionRepository.findByCategoryLevel(3);
 
-            for (CountryRestData countryData : countryDataArray) {
-                RegionRequest regionRequest = RegionMapper.toRegionRequestForCountry(countryData, parentRegions);
-                addRegion(regionRequest);
+            if (countryDataArray != null) {
+                for (CountryRestData countryData : countryDataArray) {
+                    RegionRequest regionRequest = RegionMapper.toRegionRequestForCountry(countryData, parentRegions);
+                    addRegion(regionRequest);
+                }
             }
         } catch (Exception e) {
             log.error("RegionService::importCountries execution failed with error {}", e.getMessage());
@@ -303,6 +294,7 @@ public class RegionService {
                 throw exception(EntityType.PARENT_REGION, ExceptionType.ENTITY_NOT_FOUND, regionRequest.getParentId().toString());
             });
         }
+        checkParentIsSuitable(parent, category);
 
         if (category.getLevel() == 4 && regionRequest.getCountry() == null) {
             log.error("RegionService::updateRegion execution failed with invalid country for category level Country");
@@ -447,6 +439,27 @@ public class RegionService {
         }
         Collections.reverse(path);
         return String.join(" / ", path);
+    }
+
+    private void mapListRegionDtoWithPath(List<RegionDto> regionDtos, List<Region> regions) {
+        regionDtos.forEach(regionDto -> {
+            Region region = regions.stream().filter(r -> r.getId().equals(regionDto.getId())).findFirst().orElse(null);
+            if(region != null) {
+                String path = getRegionPath(region);
+                regionDto.setPath(path);
+            }
+        });
+    }
+
+    private void checkParentIsSuitable(Region parent, Category category) {
+        int categoryLevel = category.getLevel();
+        boolean isSuitable = (categoryLevel == 1 && parent == null) ||
+                (categoryLevel > 1 && parent != null && categoryLevel == parent.getCategory().getLevel() + 1);
+
+        if (!isSuitable) {
+            log.error("RegionService::checkParentIsSuitable execution failed with parent is not suitable");
+            throw exception(EntityType.PARENT_REGION, ExceptionType.NOT_SUITABLE, parent != null ? parent.getId().toString() : "null");
+        }
     }
 
     private RuntimeException exception(EntityType entityType, ExceptionType exceptionType, String... args) {

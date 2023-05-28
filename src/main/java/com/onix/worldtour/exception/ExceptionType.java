@@ -6,7 +6,8 @@ public enum ExceptionType {
     ALREADY_USED_ELSEWHERE("used.elsewhere"),
     NOT_MATCH("not.match"),
     DUPLICATE_LEVEL("duplicate.level"),
-    ENTITY_EXCEPTION("exception");
+    ENTITY_EXCEPTION("exception"),
+    NOT_SUITABLE("not.suitable");
 
 
     private final String value;

@@ -97,6 +97,12 @@ public class Response<T> {
         return response;
     }
 
+    public static <T> Response<T> notSuitable() {
+        Response<T> response = new Response<>();
+        response.setStatus(Status.NOT_SUITABLE);
+        return response;
+    }
+
     public void addErrorMsgToResponse(String errorMsg, Exception ex) {
         ResponseError error = new ResponseError()
                 .setDetails(errorMsg)
@@ -118,7 +124,8 @@ public class Response<T> {
         ALREADY_USED_ELSEWHERE,
         ARGUMENT_NOT_VALID,
         NOT_MATCH,
-        DUPLICATE_LEVEL
+        DUPLICATE_LEVEL,
+        NOT_SUITABLE
     }
 
     @Data

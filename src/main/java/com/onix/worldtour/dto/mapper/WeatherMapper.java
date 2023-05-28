@@ -12,25 +12,51 @@ import java.util.Map;
 public class WeatherMapper {
     public static WeatherDto toWeatherDto(WeatherRestData data) {
         Map<String, String> mapper = mainWeatherMapper();
-        return new WeatherDto()
-                .setMain(mapper.get(data.getWeather()[0].getMain()))
-                .setDescription(data.getWeather()[0].getDescription())
-                .setIcon(String.format("http://openweathermap.org/img/wn/%s@4x.png", data.getWeather()[0].getIcon()))
-                .setTemperature(new WeatherDto.Temperature()
-                        .setAverage(data.getMain().getTemp().toString() + "°C")
-                        .setHigh(data.getMain().getTemp_max().toString() + "°C")
-                        .setLow(data.getMain().getTemp_min().toString() + "°C"))
-                .setHumidity(data.getMain().getHumidity().toString() + "%")
-                .setPressure(data.getMain().getPressure().toString() + "mb")
+        String iconUrl = "http://openweathermap.org/img/wn";
+
+        WeatherDto weatherDto = new WeatherDto();
+        WeatherRestData.Current current = data.getCurrent();
+        WeatherRestData.Daily[] daily = data.getDaily();
+
+        weatherDto.setCurrent(new WeatherDto.Current()
+                .setMain(mapper.get(current.getWeather()[0].getMain()))
+                .setDescription(current.getWeather()[0].getDescription())
+                .setIcon(String.format("%s/%s@4x.png", iconUrl, current.getWeather()[0].getIcon()))
+                .setTemp(current.getTemp().toString() + "°C")
+                .setHumidity(current.getHumidity().toString() + "%")
+                .setPressure(current.getPressure().toString() + "mb")
                 .setWind(new WeatherDto.Wind()
-                        .setSpeed(data.getWind().getSpeed().toString() + "m/s")
-                        .setDeg(data.getWind().getDeg().toString() + "°"))
-                .setSunrise(convertTimestampToDateTime(data.getSys().getSunrise()))
-                .setSunset(convertTimestampToDateTime(data.getSys().getSunset()));
+                        .setSpeed(current.getWind_speed().toString() + "m/s")
+                        .setDeg(current.getWind_deg().toString() + "°"))
+                .setSunrise(convertTimestampToDateTime(current.getSunrise()))
+                .setSunset(convertTimestampToDateTime(current.getSunset())));
+
+        // match daily weather
+        WeatherDto.Daily[] dailyDto = new WeatherDto.Daily[daily.length];
+        for (int i = 0; i < daily.length; i++) {
+            dailyDto[i] = new WeatherDto.Daily()
+                    .setMain(mapper.get(daily[i].getWeather()[0].getMain()))
+                    .setDescription(daily[i].getWeather()[0].getDescription())
+                    .setIcon(String.format("%s/%s@4x.png", iconUrl, daily[i].getWeather()[0].getIcon()))
+                    .setTemp(new WeatherDto.Temp()
+                            .setDay(daily[i].getTemp().getDay().toString() + "°C")
+                            .setNight(daily[i].getTemp().getNight().toString() + "°C")
+                            .setMax(daily[i].getTemp().getMax().toString() + "°C")
+                            .setMin(daily[i].getTemp().getMin().toString() + "°C"))
+                    .setHumidity(daily[i].getHumidity().toString() + "%")
+                    .setPressure(daily[i].getPressure().toString() + "mb")
+                    .setWind(new WeatherDto.Wind()
+                            .setSpeed(daily[i].getWind_speed().toString() + "m/s")
+                            .setDeg(daily[i].getWind_deg().toString() + "°"))
+                    .setSunrise(convertTimestampToDateTime(daily[i].getSunrise()))
+                    .setSunset(convertTimestampToDateTime(daily[i].getSunset()));
+        }
+        weatherDto.setDaily(dailyDto);
+        return weatherDto;
     }
 
     private static Map<String, String> mainWeatherMapper() {
-       Map<String, String> mapper = new HashMap<>();
+        Map<String, String> mapper = new HashMap<>();
         mapper.put("Clear", "Trời quang");
         mapper.put("Clouds", "Mây");
         mapper.put("Rain", "Mưa");
