@@ -66,4 +66,6 @@ public interface RegionRepository extends JpaRepository<Region, Integer> {
             @Param("categoryId") Integer categoryId,
             @Param("parentId") Integer parentId
     );
+
+    List<Region> findByParentId(Integer id);
 }
