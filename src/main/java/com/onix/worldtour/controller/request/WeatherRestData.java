@@ -12,40 +12,50 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WeatherRestData {
-    private Weather[] weather;
-    private Main main;
-    private Wind wind;
-    private Sys sys;
+    private Current current;
+    private Daily[] daily;
+
 
     @Data
     @Accessors(chain = true)
-    public static class Weather {
+    public static class Current {
+        private Double temp;
+        private Long sunrise;
+        private Long sunset;
+        private Integer humidity;
+        private Integer pressure;
+        private Double wind_speed;
+        private Integer wind_deg;
+        private WeatherInfo[] weather;
+    }
+
+    @Data
+    @Accessors(chain = true)
+    public static class Daily {
+        private Long sunrise;
+        private Long sunset;
+        private Temp temp;
+        private WeatherInfo[] weather;
+        private Integer humidity;
+        private Integer pressure;
+        private Double wind_speed;
+        private Integer wind_deg;
+
+        @Data
+        @Accessors(chain = true)
+        public static class Temp {
+            private Double day;
+            private Double night;
+            private Double min;
+            private Double max;
+        }
+    }
+
+    @Data
+    @Accessors(chain = true)
+    public static class WeatherInfo {
         private String main;
         private String description;
         private String icon;
-    }
-
-    @Data
-    @Accessors(chain = true)
-    public static class Main {
-        private Double temp;
-        private Double temp_min;
-        private Double temp_max;
-        private Double pressure;
-        private Double humidity;
-    }
-
-    @Data
-    @Accessors(chain = true)
-    public static class Wind {
-        private Double speed;
-        private Double deg;
-    }
-
-    @Data
-    @Accessors(chain = true)
-    public static class Sys {
-        private Long sunrise;
-        private Long sunset;
     }
 }

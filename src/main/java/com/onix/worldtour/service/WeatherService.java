@@ -15,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class WeatherService {
     private static final String API_KEY = "5e81a03cdaa47006f6c62c062056d455";
-    private static final String API_URL = "https://api.openweathermap.org/data/2.5/weather";
+    private static final String API_URL = "https://api.openweathermap.org/data/2.5/onecall";
 
     private final RestTemplate restTemplate;
 
@@ -49,7 +49,7 @@ public class WeatherService {
         String lat = String.valueOf(coordinate.getLattitude());
         String lon = String.valueOf(coordinate.getLongitude());
 
-        String apiUrl = String.format("%s?lat=%s&lon=%s&appid=%s&units=metric&lang=vi", API_URL, lat, lon, API_KEY);
+        String apiUrl = String.format("%s?lat=%s&lon=%s&appid=%s&exclude=hourly,minutely&units=metric&lang=vi", API_URL, lat, lon, API_KEY);
         return apiUrl;
     }
 

@@ -60,6 +60,13 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
         return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(ApplicationException.NotSuitableException.class)
+    public final ResponseEntity handleNotSuitableException(Exception ex, WebRequest request) {
+        Response<Object> response = Response.notSuitable();
+        response.addErrorMsgToResponse(ex.getMessage(), ex);
+        return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public final ResponseEntity handleAllExceptions(Exception ex, WebRequest request) {
         Response<Object> response = Response.exception();
