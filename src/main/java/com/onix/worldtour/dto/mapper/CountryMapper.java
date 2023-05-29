@@ -11,6 +11,7 @@ public class CountryMapper {
     public static CountryRequest toCountryRequest(CountryRestData data) {
         return new CountryRequest()
                 .setCode(data.getCca2())
+                .setTld(data.getTld() != null ? data.getTld()[0] : null)
                 .setCapital(data.getCapital() != null ? data.getCapital()[0] : null)
                 .setCurrency(mapCurrency(data.getCurrencies()))
                 .setLanguage(mapLanguage(data.getLanguages()))
@@ -21,6 +22,7 @@ public class CountryMapper {
         return new Country()
                 .setId(countryRequest.getId())
                 .setCode(countryRequest.getCode())
+                .setTld(countryRequest.getTld())
                 .setCapital(countryRequest.getCapital())
                 .setLanguage(countryRequest.getLanguage())
                 .setCurrency(countryRequest.getCurrency())
@@ -31,6 +33,7 @@ public class CountryMapper {
         return new CountryDto()
                 .setId(country.getId())
                 .setCode(country.getCode())
+                .setTld(country.getTld())
                 .setCapital(country.getCapital())
                 .setLanguage(country.getLanguage())
                 .setCurrency(country.getCurrency())

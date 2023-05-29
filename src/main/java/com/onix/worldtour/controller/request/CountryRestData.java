@@ -16,6 +16,7 @@ import java.util.Map;
 public class CountryRestData {
     private NameCountry name;
     private String cca2;
+    private String[] tld;
     private String[] latlng;
     private FlagCountry flags;
     private Long population;

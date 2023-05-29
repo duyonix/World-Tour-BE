@@ -84,6 +84,26 @@ public class RegionController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("/update-country-tld")
+    public ResponseEntity<Response> updateCountryTld() {
+        log.info("RegionController::updateCountryTld");
+        regionService.updateCountryTld();
+
+        Response<Object> response = Response.ok();
+        log.info("RegionController::updateCountryTld response {}", ValueMapper.jsonAsString(response));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/update-country-name")
+    public ResponseEntity<Response> updateCountryName() {
+        log.info("RegionController::updateCountryName");
+        regionService.updateCountryName();
+
+        Response<Object> response = Response.ok();
+        log.info("RegionController::updateCountryName response {}", ValueMapper.jsonAsString(response));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @GetMapping("/import-states")
     public ResponseEntity<Response> importStates() {
         log.info("RegionController::importStates");

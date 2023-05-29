@@ -23,6 +23,9 @@ public class Country {
     @Column(name = "code", nullable = false, columnDefinition = "TEXT")
     private String code;
 
+    @Column(name = "tld", columnDefinition = "TEXT")
+    private String tld;
+
     @Column(name = "capital", columnDefinition = "TEXT")
     private String capital;
 

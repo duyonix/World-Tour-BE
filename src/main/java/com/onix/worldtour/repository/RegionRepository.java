@@ -68,4 +68,6 @@ public interface RegionRepository extends JpaRepository<Region, Integer> {
     );
 
     List<Region> findByParentId(Integer id);
+
+    Region findByCountryCode(String code);
 }
