@@ -1,6 +1,6 @@
 package com.onix.worldtour.service;
 
-import com.onix.worldtour.controller.request.WeatherRestData;
+import com.onix.worldtour.controller.data.WeatherRestData;
 import com.onix.worldtour.dto.mapper.WeatherMapper;
 import com.onix.worldtour.dto.model.WeatherDto;
 import com.onix.worldtour.exception.ApplicationException;

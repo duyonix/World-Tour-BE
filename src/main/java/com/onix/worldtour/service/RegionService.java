@@ -1,10 +1,10 @@
 package com.onix.worldtour.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.onix.worldtour.controller.request.CountryNameData;
-import com.onix.worldtour.controller.request.CountryRestData;
+import com.onix.worldtour.controller.data.CountryNameData;
+import com.onix.worldtour.controller.data.CountryRestData;
 import com.onix.worldtour.controller.request.RegionRequest;
-import com.onix.worldtour.controller.request.StateData;
+import com.onix.worldtour.controller.data.StateData;
 import com.onix.worldtour.dto.mapper.CountryMapper;
 import com.onix.worldtour.dto.mapper.RegionMapper;
 import com.onix.worldtour.dto.mapper.SceneSpotMapper;
@@ -238,30 +238,6 @@ public class RegionService {
             }
         } catch (Exception e) {
             log.error("RegionService::importCountries execution failed with error {}", e.getMessage());
-            throw exception(EntityType.REGION, ExceptionType.ENTITY_EXCEPTION, e.getMessage());
-        }
-    }
-
-    @Transactional
-    public void updateCountryTld() {
-        log.info("RegionService::updateFieldTldInCountry execution started");
-        String apiUrl = "https://restcountries.com/v3.1/all";
-        try {
-            RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<CountryRestData[]> response = restTemplate.getForEntity(apiUrl, CountryRestData[].class);
-            CountryRestData[] countryDataArray = response.getBody();
-
-            if (countryDataArray != null) {
-                for (CountryRestData countryData : countryDataArray) {
-                    Country country = countryRepository.findByCode(countryData.getCca2());
-                    if(country != null) {
-                        country.setTld(countryData.getTld() != null ? countryData.getTld()[0] : null);
-                        countryRepository.save(country);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            log.error("RegionService::updateFieldTldInCountry execution failed with error {}", e.getMessage());
             throw exception(EntityType.REGION, ExceptionType.ENTITY_EXCEPTION, e.getMessage());
         }
     }

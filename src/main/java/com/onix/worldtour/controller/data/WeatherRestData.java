@@ -1,4 +1,4 @@
-package com.onix.worldtour.controller.request;
+package com.onix.worldtour.controller.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;

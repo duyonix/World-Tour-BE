@@ -1,7 +1,7 @@
 package com.onix.worldtour.dto.mapper;
 
 import com.onix.worldtour.controller.request.CountryRequest;
-import com.onix.worldtour.controller.request.CountryRestData;
+import com.onix.worldtour.controller.data.CountryRestData;
 import com.onix.worldtour.dto.model.CountryDto;
 import com.onix.worldtour.model.Country;
 
