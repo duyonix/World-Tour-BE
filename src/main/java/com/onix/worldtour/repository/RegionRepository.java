@@ -29,6 +29,7 @@ public interface RegionRepository extends JpaRepository<Region, Integer> {
             WHERE (lower(s.name) LIKE lower(concat('%', :search, '%')) OR
                 lower(s.commonName) LIKE lower(concat('%', :search, '%'))) AND
             (:level IS NULL OR s.category.level = :level)
+            ORDER BY s.category.level
             """)
     List<Region> findBySearchAndCategoryLevel(@Param("search") String search, @Param("level") Integer level);
 
@@ -40,6 +41,7 @@ public interface RegionRepository extends JpaRepository<Region, Integer> {
             AND r.coordinate.lattitude <= :maxLatitude
             AND r.coordinate.longitude >= :minLongitude
             AND r.coordinate.longitude <= :maxLongitude
+            ORDER BY r.category.level
             """)
     List<Region> findBySearchAndCategoryLevelAndWithinBounds(
             @Param("search") String search,
