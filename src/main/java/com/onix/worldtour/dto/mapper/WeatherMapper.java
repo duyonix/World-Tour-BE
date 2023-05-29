@@ -1,6 +1,6 @@
 package com.onix.worldtour.dto.mapper;
 
-import com.onix.worldtour.controller.request.WeatherRestData;
+import com.onix.worldtour.controller.data.WeatherRestData;
 import com.onix.worldtour.dto.model.WeatherDto;
 
 import java.time.Instant;

@@ -1,11 +1,10 @@
 package com.onix.worldtour.dto.mapper;
 
-import com.onix.worldtour.controller.request.CountryRestData;
+import com.onix.worldtour.controller.data.CountryRestData;
 import com.onix.worldtour.controller.request.RegionRequest;
-import com.onix.worldtour.controller.request.StateData;
+import com.onix.worldtour.controller.data.StateData;
 import com.onix.worldtour.dto.model.RegionDto;
 import com.onix.worldtour.dto.model.SceneSpotDto;
-import com.onix.worldtour.model.Category;
 import com.onix.worldtour.model.Coordinate;
 import com.onix.worldtour.model.Country;
 import com.onix.worldtour.model.Region;
