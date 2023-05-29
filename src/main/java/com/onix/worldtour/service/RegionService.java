@@ -1,6 +1,7 @@
 package com.onix.worldtour.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.onix.worldtour.controller.request.CountryNameData;
 import com.onix.worldtour.controller.request.CountryRestData;
 import com.onix.worldtour.controller.request.RegionRequest;
 import com.onix.worldtour.controller.request.StateData;
@@ -195,8 +196,8 @@ public class RegionService {
         }
 
         // has children
-        List<Region> chilrenRegions = regionRepository.findByParentId(region.getId());
-        regionDto.setHasChildren(!chilrenRegions.isEmpty());
+        List<Region> childrenRegions = regionRepository.findByParentId(region.getId());
+        regionDto.setHasChildren(!childrenRegions.isEmpty());
 
         // get 3 nearest neighboring regions
         List<Region> neighborRegions = new ArrayList<>();
@@ -237,6 +238,52 @@ public class RegionService {
             }
         } catch (Exception e) {
             log.error("RegionService::importCountries execution failed with error {}", e.getMessage());
+            throw exception(EntityType.REGION, ExceptionType.ENTITY_EXCEPTION, e.getMessage());
+        }
+    }
+
+    @Transactional
+    public void updateCountryTld() {
+        log.info("RegionService::updateFieldTldInCountry execution started");
+        String apiUrl = "https://restcountries.com/v3.1/all";
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<CountryRestData[]> response = restTemplate.getForEntity(apiUrl, CountryRestData[].class);
+            CountryRestData[] countryDataArray = response.getBody();
+
+            if (countryDataArray != null) {
+                for (CountryRestData countryData : countryDataArray) {
+                    Country country = countryRepository.findByCode(countryData.getCca2());
+                    if(country != null) {
+                        country.setTld(countryData.getTld() != null ? countryData.getTld()[0] : null);
+                        countryRepository.save(country);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("RegionService::updateFieldTldInCountry execution failed with error {}", e.getMessage());
+            throw exception(EntityType.REGION, ExceptionType.ENTITY_EXCEPTION, e.getMessage());
+        }
+    }
+
+    @Transactional
+    public void updateCountryName() {
+        // update from countries-name.json
+        log.info("RegionService::updateCountryName execution started");
+        try {
+            ClassPathResource resource = new ClassPathResource("countries-name.json");
+            ObjectMapper objectMapper = new ObjectMapper();
+            CountryNameData[] countryNameDataArray = objectMapper.readValue(resource.getInputStream(), CountryNameData[].class);
+
+            for (CountryNameData countryNameData : countryNameDataArray) {
+                Region region = regionRepository.findByCountryCode(countryNameData.getCode());
+                if(region != null) {
+                    region.setName(countryNameData.getName());
+                    regionRepository.save(region);
+                }
+            }
+        } catch (Exception e) {
+            log.error("RegionService::updateCountryName execution failed with error {}", e.getMessage());
             throw exception(EntityType.REGION, ExceptionType.ENTITY_EXCEPTION, e.getMessage());
         }
     }
@@ -325,7 +372,6 @@ public class RegionService {
 
             // update SceneSpots in Region
             List<SceneSpot> beforeSceneSpots = region.getSceneSpots() != null ? region.getSceneSpots() : new ArrayList<>();
-            // filter addSceneSpots (id == null) and updateSceneSpots (id != null), deleteSceneSpots (have in beforeSceneSpots but not in updateSceneSpots)
             List<SceneSpot> addSceneSpots = regionRequest.getSceneSpots().stream().filter(sceneSpotRequest -> sceneSpotRequest.getId() == null).map(SceneSpotMapper::toSceneSpot).toList();
             List<SceneSpot> updateSceneSpots = regionRequest.getSceneSpots().stream().filter(sceneSpotRequest -> sceneSpotRequest.getId() != null).map(SceneSpotMapper::toSceneSpot).toList();
             List<SceneSpot> deleteSceneSpots = beforeSceneSpots.stream().filter(beforeSceneSpot -> updateSceneSpots.stream().noneMatch(updateSceneSpot -> updateSceneSpot.getId().equals(beforeSceneSpot.getId()))).toList();

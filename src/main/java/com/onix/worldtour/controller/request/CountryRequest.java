@@ -18,6 +18,8 @@ public class CountryRequest {
     @NotBlank(message = "Code is required")
     private String code;
 
+    private String tld;
+
     private String capital;
 
     private String language;
