@@ -3,13 +3,9 @@ package com.onix.worldtour.dto.mapper;
 import com.onix.worldtour.controller.data.WeatherRestData;
 import com.onix.worldtour.dto.model.WeatherDto;
 import com.onix.worldtour.model.Weather;
+import com.onix.worldtour.util.Util;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class WeatherMapper {
     public static WeatherDto toWeatherDto(WeatherRestData data, List<Weather> weather) {
@@ -35,8 +31,8 @@ public class WeatherMapper {
                 .setWind(new WeatherDto.Wind()
                         .setSpeed(current.getWind_speed().toString() + "m/s")
                         .setDeg(current.getWind_deg().toString() + "°"))
-                .setSunrise(convertTimestampToDateTime(current.getSunrise()))
-                .setSunset(convertTimestampToDateTime(current.getSunset())));
+                .setSunrise(current.getSunrise())
+                .setSunset(current.getSunset()));
 
         // match daily weather
         WeatherDto.Daily[] dailyDto = new WeatherDto.Daily[daily.length];
@@ -62,14 +58,10 @@ public class WeatherMapper {
                     .setWind(new WeatherDto.Wind()
                             .setSpeed(daily[i].getWind_speed().toString() + "m/s")
                             .setDeg(daily[i].getWind_deg().toString() + "°"))
-                    .setSunrise(convertTimestampToDateTime(daily[i].getSunrise()))
-                    .setSunset(convertTimestampToDateTime(daily[i].getSunset()));
+                    .setSunrise(daily[i].getSunrise())
+                    .setSunset(daily[i].getSunset());
         }
         weatherDto.setDaily(dailyDto);
         return weatherDto;
-    }
-
-    private static LocalDateTime convertTimestampToDateTime(Long timestamp) {
-        return LocalDateTime.ofInstant(Instant.ofEpochSecond(timestamp), ZoneId.systemDefault());
     }
 }
