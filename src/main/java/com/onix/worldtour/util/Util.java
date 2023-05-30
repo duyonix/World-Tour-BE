@@ -2,10 +2,6 @@ package com.onix.worldtour.util;
 
 import com.onix.worldtour.model.Coordinate;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.TimeZone;
-
 public class Util {
     private static final double EARTH_RADIUS = 6371.0; // Earth's mean radius in kilometers
 
@@ -36,9 +32,5 @@ public class Util {
 
     public static double calculateLongitudeDelta(double distance, double latitude) {
         return Math.toDegrees(distance / (EARTH_RADIUS * Math.cos(Math.toRadians(latitude))));
-    }
-
-    public static LocalDateTime convertTimestampToDateTime(Long timestamp) {
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp * 1000), TimeZone.getDefault().toZoneId());
     }
 }
