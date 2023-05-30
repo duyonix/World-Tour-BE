@@ -23,4 +23,6 @@ public class SceneSpotDto {
     private String picture;
 
     private String review;
+
+    private Object reviewInfo;
 }

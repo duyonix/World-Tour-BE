@@ -50,11 +50,11 @@ public class RegionController {
 
     @GetMapping("/options")
     public ResponseEntity<Response> getRegionOptions(
-        @RequestParam(value = "search", defaultValue = "") String search,
-        @RequestParam(value = "level", required = false) Integer level,
-        @RequestParam(value = "lattitude", required = false) Double lattitude,
-        @RequestParam(value = "longitude", required = false) Double longitude,
-        @RequestParam(value = "distance", required = false) Double distance
+            @RequestParam(value = "search", defaultValue = "") String search,
+            @RequestParam(value = "level", required = false) Integer level,
+            @RequestParam(value = "lattitude", required = false) Double lattitude,
+            @RequestParam(value = "longitude", required = false) Double longitude,
+            @RequestParam(value = "distance", required = false) Double distance
     ) {
         log.info("RegionController::getRegionOptions search {} level {} lattitude {} longitude {} distance {}", search, level, lattitude, longitude, distance);
         List<RegionDto> regions = regionService.getRegionOptions(search, level, lattitude, longitude, distance);
@@ -65,9 +65,12 @@ public class RegionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Response> getRegion(@PathVariable("id") Integer id) {
-        log.info("RegionController::getRegion id {}", id);
-        RegionDto regionDto = regionService.getRegion(id);
+    public ResponseEntity<Response> getRegion(
+            @PathVariable("id") Integer id,
+            @RequestParam(value = "full", defaultValue = "true") Boolean full
+    ) {
+        log.info("RegionController::getRegion id {} full {}", id, full);
+        RegionDto regionDto = regionService.getRegion(id, full);
 
         Response<Object> response = Response.ok().setPayload(regionDto);
         log.info("RegionController::getRegion id {} response {}", id, ValueMapper.jsonAsString(response));

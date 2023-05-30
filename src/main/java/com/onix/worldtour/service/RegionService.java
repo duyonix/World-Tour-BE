@@ -9,6 +9,7 @@ import com.onix.worldtour.dto.mapper.CountryMapper;
 import com.onix.worldtour.dto.mapper.RegionMapper;
 import com.onix.worldtour.dto.mapper.SceneSpotMapper;
 import com.onix.worldtour.dto.model.RegionDto;
+import com.onix.worldtour.dto.model.SceneSpotDto;
 import com.onix.worldtour.dto.model.WeatherDto;
 import com.onix.worldtour.exception.ApplicationException;
 import com.onix.worldtour.exception.EntityType;
@@ -172,45 +173,62 @@ public class RegionService {
         return regionDtos;
     }
 
-    public RegionDto getRegion(Integer id) {
+    public RegionDto getRegion(Integer id, Boolean full) {
         log.info("RegionService::getRegion execution started");
         RegionDto regionDto;
 
-        log.debug("RegionService::getRegion request parameters id {}", id);
+        log.debug("RegionService::getRegion request parameters id {} full {}", id, full);
         Region region = regionRepository.findById(id).orElseThrow(() -> {
             log.error("RegionService::getRegion execution failed with invalid region id {}", id);
             return exception(EntityType.REGION, ExceptionType.ENTITY_NOT_FOUND, id.toString());
         });
-        regionDto = RegionMapper.toRegionDto(region);
 
-        // region has category level >=4 then get weather for it
-        if(region.getCategory().getLevel() >= 4) {
-            WeatherDto weather = weatherService.getWeather(region.getCoordinate());
-            regionDto.setWeather(weather);
+        if(full) {
+            regionDto = RegionMapper.toRegionDto(region);
+
+            // region has category level >=4 then get weather for it
+            if(region.getCategory().getLevel() >= 4) {
+                WeatherDto weather = weatherService.getWeather(region.getCoordinate());
+                regionDto.setWeather(weather);
+            }
+
+            // get infoReview for region
+            if(region.getReview() != null) {
+                Object infoReview = reviewService.getVideoData(region.getReview());
+                regionDto.setReviewInfo(infoReview);
+            }
+
+            // has children
+            List<Region> childrenRegions = regionRepository.findByParentId(region.getId());
+            regionDto.setHasChildren(!childrenRegions.isEmpty());
+
+            // get 3 nearest neighboring regions
+            List<Region> neighborRegions = new ArrayList<>();
+            if(region.getCategory().getLevel() != 1 && region.getParent() != null) {
+                neighborRegions = regionRepository.findByCategoryIdAndParentId(region.getCategory().getId(), region.getParent().getId());
+            }
+            List<RegionDto> neighborRegionDtos = neighborRegions.stream()
+                    .filter(neighborRegion -> !neighborRegion.getId().equals(region.getId()))
+                    .sorted(Comparator.comparing(neighborRegion -> Util.getDistance(region.getCoordinate(), neighborRegion.getCoordinate())))
+                    .map(RegionMapper::toRegionOptionDto)
+                    .limit(3)
+                    .toList();
+            regionDto.setNeighbors(neighborRegionDtos);
+
+            // add reviewInfo for review in sceneSpots
+            List<SceneSpotDto> sceneSpotDtos = regionDto.getSceneSpots();
+            if(sceneSpotDtos != null) {
+                for(SceneSpotDto sceneSpotDto : sceneSpotDtos) {
+                    if(sceneSpotDto.getReview() != null) {
+                        Object infoReview = reviewService.getVideoData(sceneSpotDto.getReview());
+                        sceneSpotDto.setReviewInfo(infoReview);
+                    }
+                }
+            }
+        } else {
+            regionDto = RegionMapper.toRegionDtoForPage(region);
         }
 
-        // get infoReview for region
-        if(region.getReview() != null) {
-            Object infoReview = reviewService.getVideoData(region.getReview());
-            regionDto.setReviewInfo(infoReview);
-        }
-
-        // has children
-        List<Region> childrenRegions = regionRepository.findByParentId(region.getId());
-        regionDto.setHasChildren(!childrenRegions.isEmpty());
-
-        // get 3 nearest neighboring regions
-        List<Region> neighborRegions = new ArrayList<>();
-        if(region.getCategory().getLevel() != 1 && region.getParent() != null) {
-            neighborRegions = regionRepository.findByCategoryIdAndParentId(region.getCategory().getId(), region.getParent().getId());
-        }
-        List<RegionDto> neighborRegionDtos = neighborRegions.stream()
-                .filter(neighborRegion -> !neighborRegion.getId().equals(region.getId()))
-                .sorted(Comparator.comparing(neighborRegion -> Util.getDistance(region.getCoordinate(), neighborRegion.getCoordinate())))
-                .map(RegionMapper::toRegionOptionDto)
-                .limit(3)
-                .toList();
-        regionDto.setNeighbors(neighborRegionDtos);
         regionDto.setPath(getRegionPath(region));
         log.debug("RegionService::getRegion received response from database {}", ValueMapper.jsonAsString(regionDto));
 
