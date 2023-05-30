@@ -25,7 +25,7 @@ public class WeatherMapper {
                 .orElse(weather.get(0));
 
         weatherDto.setCurrent(new WeatherDto.Current()
-                .setMain(currentWeather.getName())
+                .setMain(currentWeather.getVietnameseName())
                 .setBackground(currentWeather.getBackground())
                 .setDescription(current.getWeather()[0].getDescription())
                 .setIcon(String.format("%s/%s@4x.png", iconUrl, current.getWeather()[0].getIcon()))
@@ -48,7 +48,7 @@ public class WeatherMapper {
                     .orElse(weather.get(0));
 
             dailyDto[i] = new WeatherDto.Daily()
-                    .setMain(dailyWeather.getName())
+                    .setMain(dailyWeather.getVietnameseName())
                     .setBackground(dailyWeather.getBackground())
                     .setDescription(daily[i].getWeather()[0].getDescription())
                     .setIcon(String.format("%s/%s@4x.png", iconUrl, daily[i].getWeather()[0].getIcon()))
