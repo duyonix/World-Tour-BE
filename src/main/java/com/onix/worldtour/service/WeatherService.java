@@ -7,13 +7,22 @@ import com.onix.worldtour.exception.ApplicationException;
 import com.onix.worldtour.exception.EntityType;
 import com.onix.worldtour.exception.ExceptionType;
 import com.onix.worldtour.model.Coordinate;
+import com.onix.worldtour.model.Weather;
+import com.onix.worldtour.repository.WeatherRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 @Service
 @Slf4j
 public class WeatherService {
+
+    @Autowired
+    WeatherRepository weatherRepository;
+
     private static final String API_KEY = "5e81a03cdaa47006f6c62c062056d455";
     private static final String API_URL = "https://api.openweathermap.org/data/2.5/onecall";
 
@@ -31,9 +40,11 @@ public class WeatherService {
             log.debug("WeatherService::getWeather coordinate {}", coordinate);
             String apiUrl = buildApiUrl(coordinate);
 
+            List<Weather> weathers = weatherRepository.findAll();
+
             WeatherRestData weatherRestData = restTemplate.getForObject(apiUrl, WeatherRestData.class);
             if (weatherRestData != null) {
-                weatherDto = WeatherMapper.toWeatherDto(weatherRestData);
+                weatherDto = WeatherMapper.toWeatherDto(weatherRestData, weathers);
             }
             log.debug("WeatherService::getWeather received response {}", weatherDto);
         } catch (Exception e) {

@@ -45,6 +45,7 @@ public class WeatherDto {
     public static class Current {
         private String main;
         private String description;
+        private String background;
         private String icon;
         private String temp;
         private String humidity;
@@ -67,6 +68,7 @@ public class WeatherDto {
     public static class Daily {
         private String main;
         private String description;
+        private String background;
         private String icon;
         private Temp temp;
         private String humidity;

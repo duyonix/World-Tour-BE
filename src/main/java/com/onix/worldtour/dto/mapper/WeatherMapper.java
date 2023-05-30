@@ -2,24 +2,31 @@ package com.onix.worldtour.dto.mapper;
 
 import com.onix.worldtour.controller.data.WeatherRestData;
 import com.onix.worldtour.dto.model.WeatherDto;
+import com.onix.worldtour.model.Weather;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class WeatherMapper {
-    public static WeatherDto toWeatherDto(WeatherRestData data) {
-        Map<String, String> mapper = mainWeatherMapper();
+    public static WeatherDto toWeatherDto(WeatherRestData data, List<Weather> weather) {
         String iconUrl = "http://openweathermap.org/img/wn";
 
         WeatherDto weatherDto = new WeatherDto();
         WeatherRestData.Current current = data.getCurrent();
         WeatherRestData.Daily[] daily = data.getDaily();
 
+        Weather currentWeather = weather.stream()
+                .filter(w -> w.getName().equals(current.getWeather()[0].getMain()))
+                .findFirst()
+                .orElse(weather.get(0));
+
         weatherDto.setCurrent(new WeatherDto.Current()
-                .setMain(mapper.get(current.getWeather()[0].getMain()))
+                .setMain(currentWeather.getName())
+                .setBackground(currentWeather.getBackground())
                 .setDescription(current.getWeather()[0].getDescription())
                 .setIcon(String.format("%s/%s@4x.png", iconUrl, current.getWeather()[0].getIcon()))
                 .setTemp(current.getTemp().toString() + "°C")
@@ -34,8 +41,15 @@ public class WeatherMapper {
         // match daily weather
         WeatherDto.Daily[] dailyDto = new WeatherDto.Daily[daily.length];
         for (int i = 0; i < daily.length; i++) {
+            int finalI = i;
+            Weather dailyWeather = weather.stream()
+                    .filter(w -> w.getName().equals(daily[finalI].getWeather()[0].getMain()))
+                    .findFirst()
+                    .orElse(weather.get(0));
+
             dailyDto[i] = new WeatherDto.Daily()
-                    .setMain(mapper.get(daily[i].getWeather()[0].getMain()))
+                    .setMain(dailyWeather.getName())
+                    .setBackground(dailyWeather.getBackground())
                     .setDescription(daily[i].getWeather()[0].getDescription())
                     .setIcon(String.format("%s/%s@4x.png", iconUrl, daily[i].getWeather()[0].getIcon()))
                     .setTemp(new WeatherDto.Temp()
@@ -53,27 +67,6 @@ public class WeatherMapper {
         }
         weatherDto.setDaily(dailyDto);
         return weatherDto;
-    }
-
-    private static Map<String, String> mainWeatherMapper() {
-        Map<String, String> mapper = new HashMap<>();
-        mapper.put("Clear", "Trời quang");
-        mapper.put("Clouds", "Mây");
-        mapper.put("Rain", "Mưa");
-        mapper.put("Drizzle", "Mưa phùn");
-        mapper.put("Thunderstorm", "Dông");
-        mapper.put("Snow", "Tuyết");
-        mapper.put("Mist", "Sương mù");
-        mapper.put("Smoke", "Khói");
-        mapper.put("Haze", "Sương mù");
-        mapper.put("Dust", "Bụi");
-        mapper.put("Fog", "Sương mù");
-        mapper.put("Sand", "Cát");
-        mapper.put("Ash", "Tro");
-        mapper.put("Squall", "Gió mạnh");
-        mapper.put("Tornado", "Lốc xoáy");
-
-       return mapper;
     }
 
     private static LocalDateTime convertTimestampToDateTime(Long timestamp) {
