@@ -156,7 +156,7 @@ public class RegionService {
 
                 regions = regionRepository.findBySearchAndCategoryLevelAndWithinBounds(search.replaceAll("\\s+", " ").trim(), level, minLattitude, maxLattitude, minLongitude, maxLongitude);
             } else {
-                regions = regionRepository.findBySearchAndCategoryLevel(search.trim().replaceAll("\\s+", ""), level);
+                regions = regionRepository.findBySearchAndCategoryLevel(search.replaceAll("\\s+", " ").trim(), level);
             }
 
             regionDtos = regions.stream().map(RegionMapper::toRegionDtoForPage).toList();
