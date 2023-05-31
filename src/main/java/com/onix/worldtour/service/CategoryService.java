@@ -67,7 +67,7 @@ public class CategoryService {
         try {
             log.debug("CategoryService::getCategories request parameters page {}, size {}, search {}", page, size, search);
             Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
-            Page<Category> categories = categoryRepository.findByNameContainingIgnoreCase(search, pageable);
+            Page<Category> categories = categoryRepository.findByNameContainingIgnoreCase(search.replaceAll("\\s+", " ").trim(), pageable);
 
             categoryDtos = categories.map(CategoryMapper::toCategoryDto);
             log.debug("CategoryService::getCategories received response from database {}", ValueMapper.jsonAsString(categoryDtos));

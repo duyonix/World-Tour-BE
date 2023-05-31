@@ -1,4 +1,4 @@
-package com.onix.worldtour.service;
+package com.onix.worldtour.controller.data;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

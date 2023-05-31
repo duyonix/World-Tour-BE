@@ -125,7 +125,7 @@ public class RegionService {
         try {
             log.debug("RegionService::getRegions request parameters page {}, size {}, search {}, categoryId {}, parentId {}", page, size, search, categoryId, parentId);
             Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
-            Page<Region> regions = regionRepository.findBySearchAndCategoryIdAndParentId(search, categoryId, parentId, pageable);
+            Page<Region> regions = regionRepository.findBySearchAndCategoryIdAndParentId(search.replaceAll("\\s+", " ").trim(), categoryId, parentId, pageable);
 
             regionDtos = regions.map(RegionMapper::toRegionDtoForPage);
             mapListRegionDtoWithPath(regionDtos.getContent(), regions.getContent());
@@ -154,9 +154,9 @@ public class RegionService {
                 double minLongitude = longitude - longitudeDelta;
                 double maxLongitude = longitude + longitudeDelta;
 
-                regions = regionRepository.findBySearchAndCategoryLevelAndWithinBounds(search, level, minLattitude, maxLattitude, minLongitude, maxLongitude);
+                regions = regionRepository.findBySearchAndCategoryLevelAndWithinBounds(search.replaceAll("\\s+", " ").trim(), level, minLattitude, maxLattitude, minLongitude, maxLongitude);
             } else {
-                regions = regionRepository.findBySearchAndCategoryLevel(search, level);
+                regions = regionRepository.findBySearchAndCategoryLevel(search.trim().replaceAll("\\s+", ""), level);
             }
 
             regionDtos = regions.stream().map(RegionMapper::toRegionDtoForPage).toList();
