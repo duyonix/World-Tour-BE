@@ -28,6 +28,9 @@ public class Category {
     @Column(name = "level", nullable = false, unique = true, columnDefinition = "INTEGER")
     private Integer level;
 
+    @Column(name = "zoom_factor", nullable = false, columnDefinition = "DOUBLE PRECISION")
+    private Double zoomFactor;
+
     @Column(name = "picture", columnDefinition = "TEXT")
     private String picture;
 

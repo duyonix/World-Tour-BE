@@ -9,6 +9,7 @@ public class CategoryMapper {
         return new Category()
                 .setName(categoryRequest.getName())
                 .setLevel(categoryRequest.getLevel())
+                .setZoomFactor(categoryRequest.getZoomFactor())
                 .setPicture(categoryRequest.getPicture())
                 .setDescription(categoryRequest.getDescription());
     }
@@ -18,6 +19,7 @@ public class CategoryMapper {
                 .setId(category.getId())
                 .setName(category.getName())
                 .setLevel(category.getLevel())
+                .setZoomFactor(category.getZoomFactor())
                 .setPicture(category.getPicture())
                 .setDescription(category.getDescription());
     }
@@ -26,6 +28,7 @@ public class CategoryMapper {
         return new CategoryDto()
                 .setId(category.getId())
                 .setName(category.getName())
-                .setLevel(category.getLevel());
+                .setLevel(category.getLevel())
+                .setZoomFactor(category.getZoomFactor());
     }
 }

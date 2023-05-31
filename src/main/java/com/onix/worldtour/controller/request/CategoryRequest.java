@@ -20,6 +20,9 @@ public class CategoryRequest {
     @NotNull(message = "Level is required")
     private Integer level;
 
+    @NotNull(message = "Zoom factor is required")
+    private Double zoomFactor;
+
     @NotNull(message = "Picture is required")
     private String picture;
 
