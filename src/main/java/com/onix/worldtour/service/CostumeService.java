@@ -88,7 +88,7 @@ public class CostumeService {
             log.debug("CostumeService::getCostumes request parameters page {}, size {}, search {}, regionId {} type {}", page, size, search, regionId, type);
             Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
             CostumeType costumeType = type != null ? CostumeType.valueOf(type.toUpperCase()) : null;
-            Page<Costume> costumes = costumeRepository.findByNameContainingAndRegionIdAndType(search, regionId, costumeType, pageable);
+            Page<Costume> costumes = costumeRepository.findByNameContainingAndRegionIdAndType(search.replaceAll("\\s+", " ").trim(), regionId, costumeType, pageable);
             log.info("CostumeService::getCostumes received response from database costumes {}", ValueMapper.jsonAsString(costumes));
 
             costumeDtos = costumes.map(CostumeMapper::toCostumeDto);
