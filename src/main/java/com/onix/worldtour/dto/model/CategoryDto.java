@@ -20,6 +20,8 @@ public class CategoryDto {
 
     private Integer level;
 
+    private Double zoomFactor;
+
     private String picture;
 
     private String description;

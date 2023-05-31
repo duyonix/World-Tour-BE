@@ -58,7 +58,7 @@ public class User implements UserDetails {
     private List<Token> tokens;
 
     public String getFullName() {
-        return firstName != null ? firstName.concat(" ").concat(lastName) : "";
+        return lastName != null ? lastName.concat(" ").concat(firstName) : "";
     }
 
     @Override
