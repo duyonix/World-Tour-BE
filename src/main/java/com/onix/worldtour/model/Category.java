@@ -31,7 +31,7 @@ public class Category {
     @Column(name = "zoom_factor", nullable = false, columnDefinition = "DOUBLE PRECISION")
     private Double zoomFactor;
 
-    @Column(name = "picture", columnDefinition = "TEXT")
+    @Column(name = "picture", nullable = false, columnDefinition = "TEXT")
     private String picture;
 
     @Column(name = "description", columnDefinition = "TEXT")

@@ -185,47 +185,7 @@ public class RegionService {
         });
 
         if (full) {
-            regionDto = RegionMapper.toRegionDto(region);
-
-            // region has category level >=4 then get weather for it
-            if (region.getCategory().getLevel() >= 4) {
-                WeatherDto weather = weatherService.getWeather(region.getCoordinate());
-                regionDto.setWeather(weather);
-            }
-
-            // get infoReview for region
-            if (region.getReview() != null) {
-                Object infoReview = reviewService.getVideoData(region.getReview());
-                regionDto.setReviewInfo(infoReview);
-            }
-
-            // has children
-            List<Region> childrenRegions = regionRepository.findByParentId(region.getId());
-            regionDto.setHasChildren(!childrenRegions.isEmpty());
-
-            // get 3 nearest neighboring regions
-            List<Region> neighborRegions = new ArrayList<>();
-            if (region.getCategory().getLevel() != 1 && region.getParent() != null) {
-                neighborRegions = regionRepository.findByCategoryIdAndParentId(region.getCategory().getId(), region.getParent().getId());
-            }
-            List<RegionDto> neighborRegionDtos = neighborRegions.stream()
-                    .filter(neighborRegion -> !neighborRegion.getId().equals(region.getId()))
-                    .sorted(Comparator.comparing(neighborRegion -> Util.getDistance(region.getCoordinate(), neighborRegion.getCoordinate())))
-                    .map(RegionMapper::toRegionOptionDto)
-                    .limit(3)
-                    .toList();
-            regionDto.setNeighbors(neighborRegionDtos);
-
-            // add reviewInfo for review in sceneSpots
-            List<SceneSpotDto> sceneSpotDtos = regionDto.getSceneSpots();
-            if (sceneSpotDtos != null) {
-                for (SceneSpotDto sceneSpotDto : sceneSpotDtos) {
-                    if (sceneSpotDto.getReview() != null) {
-                        Object infoReview = reviewService.getVideoData(sceneSpotDto.getReview());
-                        sceneSpotDto.setReviewInfo(infoReview);
-                    }
-                }
-            }
+            regionDto = getFullRegionDto(region);
         } else {
             regionDto = RegionMapper.toRegionDtoForPage(region);
         }
@@ -266,7 +226,7 @@ public class RegionService {
         // update from countries-name.json
         log.info("RegionService::updateCountryName execution started");
         try {
-            ClassPathResource resource = new ClassPathResource("countries-name.json");
+            ClassPathResource resource = new ClassPathResource("data/countries-name.json");
             ObjectMapper objectMapper = new ObjectMapper();
             CountryNameData[] countryNameDataArray = objectMapper.readValue(resource.getInputStream(), CountryNameData[].class);
 
@@ -288,7 +248,7 @@ public class RegionService {
         // import from states.json
         log.info("RegionService::importStates execution started");
         try {
-            ClassPathResource resource = new ClassPathResource("states.json");
+            ClassPathResource resource = new ClassPathResource("data/states.json");
             ObjectMapper objectMapper = new ObjectMapper();
             StateData[] stateDataArray = objectMapper.readValue(resource.getInputStream(), StateData[].class);
             List<Region> countries = regionRepository.findByCategoryLevel(4); // get List of Regions has category level 4: Country
@@ -314,7 +274,7 @@ public class RegionService {
         // update from vietnam-states.json
         log.info("RegionService::updateVietNamState execution started");
         try {
-            ClassPathResource resource = new ClassPathResource("vietnam-states.json");
+            ClassPathResource resource = new ClassPathResource("data/vietnam-states.json");
             ObjectMapper objectMapper = new ObjectMapper();
             VietNamStateData[] stateDataArray = objectMapper.readValue(resource.getInputStream(), VietNamStateData[].class);
 
@@ -470,6 +430,55 @@ public class RegionService {
 
         log.info("RegionService::deleteRegion execution completed");
         return regionDto;
+    }
+
+    private RegionDto getFullRegionDto(Region region) {
+        RegionDto regionDto = RegionMapper.toRegionDto(region);
+
+        if (region.getCategory().getLevel() >= 4) {
+            WeatherDto weather = weatherService.getWeather(region.getCoordinate());
+            regionDto.setWeather(weather);
+        }
+
+        if (region.getReview() != null) {
+            Object infoReview = reviewService.getVideoData(region.getReview());
+            regionDto.setReviewInfo(infoReview);
+        }
+
+        List<Region> childrenRegions = regionRepository.findByParentId(region.getId());
+        regionDto.setHasChildren(!childrenRegions.isEmpty());
+
+        List<RegionDto> neighborRegionDtos = getNearestNeighborRegionDtos(region);
+        regionDto.setNeighbors(neighborRegionDtos);
+
+        List<SceneSpotDto> sceneSpotDtos = regionDto.getSceneSpots();
+        if (sceneSpotDtos != null) {
+            addReviewInfoToSceneSpotDtos(sceneSpotDtos);
+        }
+
+        return regionDto;
+    }
+
+    private List<RegionDto> getNearestNeighborRegionDtos(Region region) {
+        List<Region> neighborRegions = new ArrayList<>();
+        if (region.getCategory().getLevel() != 1 && region.getParent() != null) {
+            neighborRegions = regionRepository.findByCategoryIdAndParentId(region.getCategory().getId(), region.getParent().getId());
+        }
+        return neighborRegions.stream()
+                .filter(neighborRegion -> !neighborRegion.getId().equals(region.getId()))
+                .sorted(Comparator.comparing(neighborRegion -> Util.getDistance(region.getCoordinate(), neighborRegion.getCoordinate())))
+                .map(RegionMapper::toRegionOptionDto)
+                .limit(3)
+                .toList();
+    }
+
+    private void addReviewInfoToSceneSpotDtos(List<SceneSpotDto> sceneSpotDtos) {
+        for (SceneSpotDto sceneSpotDto : sceneSpotDtos) {
+            if (sceneSpotDto.getReview() != null) {
+                Object infoReview = reviewService.getVideoData(sceneSpotDto.getReview());
+                sceneSpotDto.setReviewInfo(infoReview);
+            }
+        }
     }
 
     public List<RegionDto> getAncestorRegions(Integer id) {

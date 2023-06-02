@@ -27,13 +27,14 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public Page<UserDto> getUsers(Integer page, Integer size, String search) {
+    public Page<UserDto> getUsers(Integer page, Integer size, String search, String role) {
         log.info("UserService::getUsers execution started");
         Page<UserDto> userDtos;
         try {
-            log.debug("UserService::getUsers request parameters page {}, size {}, search {}", page, size, search);
+            log.debug("UserService::getUsers request parameters page {}, size {}, search {} role {}", page, size, search, role);
             Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
-            Page<User> users = userRepository.findByEmailContainingIgnoreCase(search.replaceAll("\\s+", " ").trim(), pageable);
+            Role roleEnum = role != null ? Role.valueOf(role.toUpperCase()) : null;
+            Page<User> users = userRepository.findByEmailSearchAndRole(search.replaceAll("\\s+", " ").trim(), roleEnum, pageable);
 
             userDtos = users.map(UserMapper::toUserDto);
             log.debug("UserService::getUsers received response from database {}", userDtos);

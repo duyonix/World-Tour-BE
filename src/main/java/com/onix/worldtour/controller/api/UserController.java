@@ -4,6 +4,7 @@ import com.onix.worldtour.controller.request.RoleRequest;
 import com.onix.worldtour.controller.request.UpdatePasswordRequest;
 import com.onix.worldtour.dto.model.UserDto;
 import com.onix.worldtour.dto.response.Response;
+import com.onix.worldtour.model.Role;
 import com.onix.worldtour.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +25,11 @@ public class UserController {
     public ResponseEntity<Response> getUsers(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "10") Integer size,
-            @RequestParam(value = "search", defaultValue = "") String search
+            @RequestParam(value = "search", defaultValue = "") String search,
+            @RequestParam(value = "role", required = false) String role
     ) {
-        log.info("UserController::getUsers page {} size {} search {}", page, size, search);
-        Page<UserDto> users = userService.getUsers(page, size, search);
+        log.info("UserController::getUsers page {} size {} search {} role {}", page, size, search, role);
+        Page<UserDto> users = userService.getUsers(page, size, search, role);
 
         Response<Object> response = Response.ok().setPayload(users);
         log.info("UserController::getUsers response {}", response);
