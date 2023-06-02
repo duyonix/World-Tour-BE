@@ -1,4 +1,4 @@
-package com.onix.worldtour.dto.model;
+package com.onix.worldtour.controller.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
@@ -11,18 +11,10 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CountryDto {
-    private Integer id;
-
-    private String code;
-
-    private String tld;
-
-    private String capital;
-
-    private String language;
-
-    private String currency;
-
-    private String timezone;
+public class VietNamStateData {
+    private Integer index;
+    private String name;
+    private Double area;
+    private Long population;
+    private String picture;
 }
