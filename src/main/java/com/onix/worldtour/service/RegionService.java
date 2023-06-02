@@ -3,6 +3,7 @@ package com.onix.worldtour.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onix.worldtour.controller.data.CountryNameData;
 import com.onix.worldtour.controller.data.CountryRestData;
+import com.onix.worldtour.controller.data.VietNamStateData;
 import com.onix.worldtour.controller.request.RegionRequest;
 import com.onix.worldtour.controller.data.StateData;
 import com.onix.worldtour.dto.mapper.CountryMapper;
@@ -101,7 +102,7 @@ public class RegionService {
                 savedRegion.setCountry(savedCountry);
             }
 
-            if(regionRequest.getSceneSpots() != null && !regionRequest.getSceneSpots().isEmpty()) {
+            if (regionRequest.getSceneSpots() != null && !regionRequest.getSceneSpots().isEmpty()) {
                 List<SceneSpot> sceneSpots = regionRequest.getSceneSpots().stream().map(SceneSpotMapper::toSceneSpot).toList();
                 sceneSpots.forEach(sceneSpot -> sceneSpot.setRegion(savedRegion));
                 List<SceneSpot> savedSceneSpots = sceneSpotRepository.saveAll(sceneSpots);
@@ -145,7 +146,7 @@ public class RegionService {
         try {
             log.debug("RegionService::getRegionOptions request parameters search {}, level {}, lattitude {}, longitude {}, distance {}", search, level, lattitude, longitude, distance);
             List<Region> regions;
-            if(lattitude != null && longitude != null && distance != null) {
+            if (lattitude != null && longitude != null && distance != null) {
                 double lattitudeDelta = Util.calculateLatitudeDelta(distance);
                 double longitudeDelta = Util.calculateLongitudeDelta(distance, lattitude);
 
@@ -183,17 +184,17 @@ public class RegionService {
             return exception(EntityType.REGION, ExceptionType.ENTITY_NOT_FOUND, id.toString());
         });
 
-        if(full) {
+        if (full) {
             regionDto = RegionMapper.toRegionDto(region);
 
             // region has category level >=4 then get weather for it
-            if(region.getCategory().getLevel() >= 4) {
+            if (region.getCategory().getLevel() >= 4) {
                 WeatherDto weather = weatherService.getWeather(region.getCoordinate());
                 regionDto.setWeather(weather);
             }
 
             // get infoReview for region
-            if(region.getReview() != null) {
+            if (region.getReview() != null) {
                 Object infoReview = reviewService.getVideoData(region.getReview());
                 regionDto.setReviewInfo(infoReview);
             }
@@ -204,7 +205,7 @@ public class RegionService {
 
             // get 3 nearest neighboring regions
             List<Region> neighborRegions = new ArrayList<>();
-            if(region.getCategory().getLevel() != 1 && region.getParent() != null) {
+            if (region.getCategory().getLevel() != 1 && region.getParent() != null) {
                 neighborRegions = regionRepository.findByCategoryIdAndParentId(region.getCategory().getId(), region.getParent().getId());
             }
             List<RegionDto> neighborRegionDtos = neighborRegions.stream()
@@ -217,9 +218,9 @@ public class RegionService {
 
             // add reviewInfo for review in sceneSpots
             List<SceneSpotDto> sceneSpotDtos = regionDto.getSceneSpots();
-            if(sceneSpotDtos != null) {
-                for(SceneSpotDto sceneSpotDto : sceneSpotDtos) {
-                    if(sceneSpotDto.getReview() != null) {
+            if (sceneSpotDtos != null) {
+                for (SceneSpotDto sceneSpotDto : sceneSpotDtos) {
+                    if (sceneSpotDto.getReview() != null) {
                         Object infoReview = reviewService.getVideoData(sceneSpotDto.getReview());
                         sceneSpotDto.setReviewInfo(infoReview);
                     }
@@ -271,7 +272,7 @@ public class RegionService {
 
             for (CountryNameData countryNameData : countryNameDataArray) {
                 Region region = regionRepository.findByCountryCode(countryNameData.getCode());
-                if(region != null) {
+                if (region != null) {
                     region.setName(countryNameData.getName());
                     regionRepository.save(region);
                 }
@@ -309,6 +310,35 @@ public class RegionService {
     }
 
     @Transactional
+    public void updateVietNamStates() {
+        // update from vietnam-states.json
+        log.info("RegionService::updateVietNamState execution started");
+        try {
+            ClassPathResource resource = new ClassPathResource("vietnam-states.json");
+            ObjectMapper objectMapper = new ObjectMapper();
+            VietNamStateData[] stateDataArray = objectMapper.readValue(resource.getInputStream(), VietNamStateData[].class);
+
+            Region regionVietNam = regionRepository.findByCountryCode("VN");
+
+            if (regionVietNam != null) {
+                for (VietNamStateData stateData : stateDataArray) {
+                    Region region = regionRepository.findByNameAndParentId(stateData.getName(), regionVietNam.getId());
+                    if (region != null) {
+                        region.setArea(stateData.getArea())
+                                .setPopulation(stateData.getPopulation())
+                                .setPicture(stateData.getPicture());
+                        regionRepository.save(region);
+                    }
+
+                }
+            }
+        } catch (Exception e) {
+            log.error("RegionService::updateVietNamState execution failed with error {}", e.getMessage());
+            throw exception(EntityType.REGION, ExceptionType.ENTITY_EXCEPTION, e.getMessage());
+        }
+    }
+
+    @Transactional
     public RegionDto updateRegion(Integer id, RegionRequest regionRequest) {
         log.info("RegionService::updateRegion execution started");
         RegionDto regionDto;
@@ -321,7 +351,7 @@ public class RegionService {
 
         regionRepository.findByNameOrCommonNameAndCategoryIdAndParentId(regionRequest.getName(), regionRequest.getCommonName(), regionRequest.getCategoryId(), regionRequest.getParentId())
                 .ifPresent(duplicateRegion -> {
-                    if(!duplicateRegion.getId().equals(id)) {
+                    if (!duplicateRegion.getId().equals(id)) {
                         log.error("RegionService::updateRegion execution failed with duplicate region name {} or common name {} for category {}", regionRequest.getName(), regionRequest.getCommonName(), regionRequest.getCategoryId());
                         throw exception(EntityType.REGION, ExceptionType.DUPLICATE_ENTITY, regionRequest.getName() + " or " + regionRequest.getCommonName());
                     }
@@ -426,7 +456,7 @@ public class RegionService {
             if (region.getCountry() != null) {
                 countryRepository.delete(region.getCountry());
             }
-            if(!region.getSceneSpots().isEmpty()) {
+            if (!region.getSceneSpots().isEmpty()) {
                 sceneSpotRepository.deleteAll(region.getSceneSpots());
             }
 
@@ -488,7 +518,7 @@ public class RegionService {
     private void mapListRegionDtoWithPath(List<RegionDto> regionDtos, List<Region> regions) {
         regionDtos.forEach(regionDto -> {
             Region region = regions.stream().filter(r -> r.getId().equals(regionDto.getId())).findFirst().orElse(null);
-            if(region != null) {
+            if (region != null) {
                 String path = getRegionPath(region);
                 regionDto.setPath(path);
             }

@@ -107,6 +107,16 @@ public class RegionController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("/update-vietnam-states")
+    public ResponseEntity<Response> updateVietNamStates() {
+        log.info("RegionController::updateVietnamStates");
+        regionService.updateVietNamStates();
+
+        Response<Object> response = Response.ok();
+        log.info("RegionController::updateVietnamStates response {}", ValueMapper.jsonAsString(response));
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Response> updateRegion(@PathVariable("id") Integer id, @RequestBody @Valid RegionRequest regionRequest) {
         log.info("RegionController::updateRegion id {} request body {}", id, ValueMapper.jsonAsString(regionRequest));
