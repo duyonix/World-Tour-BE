@@ -23,6 +23,9 @@ public class CategoryRequest {
     @NotNull(message = "Zoom factor is required")
     private Double zoomFactor;
 
+    @NotNull(message = "Scale factor is required")
+    private Double scaleFactor;
+
     @NotNull(message = "Picture is required")
     private String picture;
 

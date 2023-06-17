@@ -22,6 +22,8 @@ public class CategoryDto {
 
     private Double zoomFactor;
 
+    private Double scaleFactor;
+
     private String picture;
 
     private String description;
