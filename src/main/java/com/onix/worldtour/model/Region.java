@@ -70,6 +70,9 @@ public class Region {
     @Column(name = "area", columnDefinition = "DOUBLE PRECISION")
     private Double area;
 
+    @Column(name = "panorama", columnDefinition = "TEXT")
+    private String panorama;
+
     @OneToOne(mappedBy = "region", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, optional = true)
     @JsonIgnoreProperties("region")
     private Country country;
