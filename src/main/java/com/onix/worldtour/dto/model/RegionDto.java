@@ -48,6 +48,8 @@ public class RegionDto {
 
     private Double area;
 
+    private String panorama;
+
     private Integer countryId;
 
     private CountryDto country;

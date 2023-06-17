@@ -54,6 +54,7 @@ public class RegionMapper {
                 .setCoordinate(regionRequest.getCoordinate())
                 .setPopulation(regionRequest.getPopulation())
                 .setArea(regionRequest.getArea())
+                .setPanorama(regionRequest.getPanorama())
                 .setReview(regionRequest.getReview());
     }
 
@@ -75,6 +76,7 @@ public class RegionMapper {
                 .setParent(parent != null ? RegionMapper.toRegionOptionDto(parent) : null)
                 .setPopulation(region.getPopulation())
                 .setArea(region.getArea())
+                .setPanorama(region.getPanorama())
                 .setReview(region.getReview())
                 .setCountryId(country != null ? country.getId() : null)
                 .setCountry(country != null ? CountryMapper.toCountryDto(country) : null);

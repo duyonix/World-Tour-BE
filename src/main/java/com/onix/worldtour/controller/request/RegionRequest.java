@@ -46,6 +46,8 @@ public class RegionRequest {
 
     private Double area;
 
+    private String panorama;
+
     private CountryRequest country;
 
     private List<SceneSpotRequest> sceneSpots;
