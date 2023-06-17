@@ -31,6 +31,9 @@ public class Category {
     @Column(name = "zoom_factor", nullable = false, columnDefinition = "DOUBLE PRECISION")
     private Double zoomFactor;
 
+    @Column(name = "scale_factor", nullable = false, columnDefinition = "DOUBLE PRECISION")
+    private Double scaleFactor;
+
     @Column(name = "picture", nullable = false, columnDefinition = "TEXT")
     private String picture;
 
