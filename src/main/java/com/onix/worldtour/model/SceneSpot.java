@@ -29,6 +29,9 @@ public class SceneSpot {
     @Column(name = "picture", nullable = false, columnDefinition = "TEXT")
     private String picture;
 
+    @Column(name = "panorama", columnDefinition = "TEXT")
+    private String panorama;
+
     @Column(name = "review", columnDefinition = "TEXT")
     private String review;
 

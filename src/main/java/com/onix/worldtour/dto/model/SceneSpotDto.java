@@ -22,6 +22,8 @@ public class SceneSpotDto {
 
     private String picture;
 
+    private String panorama;
+
     private String review;
 
     private Object reviewInfo;
