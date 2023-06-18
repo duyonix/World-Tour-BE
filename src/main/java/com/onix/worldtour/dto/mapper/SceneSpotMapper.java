@@ -11,6 +11,7 @@ public class SceneSpotMapper {
                 .setName(sceneSpotRequest.getName())
                 .setDescription(sceneSpotRequest.getDescription())
                 .setPicture(sceneSpotRequest.getPicture())
+                .setPanorama(sceneSpotRequest.getPanorama())
                 .setReview(sceneSpotRequest.getReview());
     }
 
@@ -20,6 +21,7 @@ public class SceneSpotMapper {
                 .setName(sceneSpot.getName())
                 .setDescription(sceneSpot.getDescription())
                 .setPicture(sceneSpot.getPicture())
+                .setPanorama(sceneSpot.getPanorama())
                 .setReview(sceneSpot.getReview());
     }
 }
