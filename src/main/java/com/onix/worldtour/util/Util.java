@@ -1,6 +1,7 @@
 package com.onix.worldtour.util;
 
 import com.onix.worldtour.model.Coordinate;
+import com.onix.worldtour.model.PanoramaType;
 
 public class Util {
     private static final double EARTH_RADIUS = 6371.0; // Earth's mean radius in kilometers
@@ -32,5 +33,28 @@ public class Util {
 
     public static double calculateLongitudeDelta(double distance, double latitude) {
         return Math.toDegrees(distance / (EARTH_RADIUS * Math.cos(Math.toRadians(latitude))));
+    }
+
+    public static PanoramaType getPanoramaType(String panorama) {
+        if (panorama == null) {
+            return null;
+        }
+
+        String lowercasePanorama = panorama.toLowerCase();
+        if (isImage(lowercasePanorama)) {
+            return PanoramaType.IMAGE;
+        } else if (isVideo(lowercasePanorama)) {
+            return PanoramaType.VIDEO;
+        } else {
+            return null;
+        }
+    }
+
+    private static boolean isImage(String panorama) {
+        return panorama.endsWith(".jpg") || panorama.endsWith(".jpeg") || panorama.endsWith(".png") || panorama.endsWith(".gif");
+    }
+
+    private static boolean isVideo(String panorama) {
+        return panorama.endsWith(".mp4") || panorama.endsWith(".avi") || panorama.endsWith(".mov") || panorama.endsWith(".wmv");
     }
 }

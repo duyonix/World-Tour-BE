@@ -32,6 +32,10 @@ public class SceneSpot {
     @Column(name = "panorama", columnDefinition = "TEXT")
     private String panorama;
 
+    @Column(name = "panorama_type")
+    @Enumerated(EnumType.STRING)
+    private PanoramaType panoramaType;
+
     @Column(name = "review", columnDefinition = "TEXT")
     private String review;
 

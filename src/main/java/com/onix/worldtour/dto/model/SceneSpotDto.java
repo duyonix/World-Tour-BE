@@ -2,6 +2,7 @@ package com.onix.worldtour.dto.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.onix.worldtour.model.PanoramaType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,8 @@ public class SceneSpotDto {
     private String picture;
 
     private String panorama;
+
+    private PanoramaType panoramaType;
 
     private String review;
 

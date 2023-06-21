@@ -73,6 +73,10 @@ public class Region {
     @Column(name = "panorama", columnDefinition = "TEXT")
     private String panorama;
 
+    @Column(name = "panorama_type")
+    @Enumerated(EnumType.STRING)
+    private PanoramaType panoramaType;
+
     @OneToOne(mappedBy = "region", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, optional = true)
     @JsonIgnoreProperties("region")
     private Country country;

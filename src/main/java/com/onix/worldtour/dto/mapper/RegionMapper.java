@@ -8,6 +8,7 @@ import com.onix.worldtour.dto.model.SceneSpotDto;
 import com.onix.worldtour.model.Coordinate;
 import com.onix.worldtour.model.Country;
 import com.onix.worldtour.model.Region;
+import com.onix.worldtour.util.Util;
 
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,7 @@ public class RegionMapper {
                 .setPopulation(regionRequest.getPopulation())
                 .setArea(regionRequest.getArea())
                 .setPanorama(regionRequest.getPanorama())
+                .setPanoramaType(Util.getPanoramaType(regionRequest.getPanorama()))
                 .setReview(regionRequest.getReview());
     }
 
@@ -77,6 +79,7 @@ public class RegionMapper {
                 .setPopulation(region.getPopulation())
                 .setArea(region.getArea())
                 .setPanorama(region.getPanorama())
+                .setPanoramaType(region.getPanoramaType())
                 .setReview(region.getReview())
                 .setCountryId(country != null ? country.getId() : null)
                 .setCountry(country != null ? CountryMapper.toCountryDto(country) : null);

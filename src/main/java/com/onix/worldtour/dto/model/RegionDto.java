@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.onix.worldtour.model.Coordinate;
 import com.onix.worldtour.model.Country;
+import com.onix.worldtour.model.PanoramaType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -49,6 +50,8 @@ public class RegionDto {
     private Double area;
 
     private String panorama;
+
+    private PanoramaType panoramaType;
 
     private Integer countryId;
 
