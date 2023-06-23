@@ -48,6 +48,8 @@ public class RegionRequest {
 
     private String panorama;
 
+    private String model;
+
     private CountryRequest country;
 
     private List<SceneSpotRequest> sceneSpots;

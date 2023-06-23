@@ -57,6 +57,7 @@ public class RegionMapper {
                 .setArea(regionRequest.getArea())
                 .setPanorama(regionRequest.getPanorama())
                 .setPanoramaType(Util.getPanoramaType(regionRequest.getPanorama()))
+                .setModel(regionRequest.getModel())
                 .setReview(regionRequest.getReview());
     }
 
@@ -80,6 +81,7 @@ public class RegionMapper {
                 .setArea(region.getArea())
                 .setPanorama(region.getPanorama())
                 .setPanoramaType(region.getPanoramaType())
+                .setModel(region.getModel())
                 .setReview(region.getReview())
                 .setCountryId(country != null ? country.getId() : null)
                 .setCountry(country != null ? CountryMapper.toCountryDto(country) : null);

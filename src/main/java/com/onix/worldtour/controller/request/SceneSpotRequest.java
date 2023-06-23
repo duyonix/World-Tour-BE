@@ -1,6 +1,7 @@
 package com.onix.worldtour.controller.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.onix.worldtour.model.Virtual3D;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,6 +25,8 @@ public class SceneSpotRequest {
     private String picture;
 
     private String panorama;
+
+    private Virtual3D virtual3D;
 
     private String review;
 }

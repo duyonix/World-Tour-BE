@@ -36,6 +36,14 @@ public class SceneSpot {
     @Enumerated(EnumType.STRING)
     private PanoramaType panoramaType;
 
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "x", column = @Column(name = "virtual_3d_x")),
+            @AttributeOverride(name = "y", column = @Column(name = "virtual_3d_y")),
+            @AttributeOverride(name = "z", column = @Column(name = "virtual_3d_z"))
+    })
+    private Virtual3D virtual3D;
+
     @Column(name = "review", columnDefinition = "TEXT")
     private String review;
 

@@ -14,6 +14,7 @@ public class SceneSpotMapper {
                 .setPicture(sceneSpotRequest.getPicture())
                 .setPanorama(sceneSpotRequest.getPanorama())
                 .setPanoramaType(Util.getPanoramaType(sceneSpotRequest.getPanorama()))
+                .setVirtual3D(sceneSpotRequest.getVirtual3D())
                 .setReview(sceneSpotRequest.getReview());
     }
 
@@ -25,6 +26,7 @@ public class SceneSpotMapper {
                 .setPicture(sceneSpot.getPicture())
                 .setPanorama(sceneSpot.getPanorama())
                 .setPanoramaType(sceneSpot.getPanoramaType())
+                .setVirtual3D(sceneSpot.getVirtual3D())
                 .setReview(sceneSpot.getReview());
     }
 }

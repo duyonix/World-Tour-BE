@@ -53,6 +53,8 @@ public class RegionDto {
 
     private PanoramaType panoramaType;
 
+    private String model;
+
     private Integer countryId;
 
     private CountryDto country;

@@ -51,7 +51,6 @@ public class Region {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "regions"})
     private Category category;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "children", "category"})
@@ -76,6 +75,9 @@ public class Region {
     @Column(name = "panorama_type")
     @Enumerated(EnumType.STRING)
     private PanoramaType panoramaType;
+
+    @Column(name = "model", columnDefinition = "TEXT")
+    private String model;
 
     @OneToOne(mappedBy = "region", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, optional = true)
     @JsonIgnoreProperties("region")
