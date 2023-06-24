@@ -58,6 +58,9 @@ public class RegionService {
     @Autowired
     private ReviewService reviewService;
 
+    @Autowired
+    private GoogleStreetViewService googleStreetViewService;
+
     @Transactional
     public RegionDto addRegion(RegionRequest regionRequest) {
         log.info("RegionService::addRegion execution started");
@@ -456,8 +459,12 @@ public class RegionService {
             addReviewInfoToSceneSpotDtos(sceneSpotDtos);
         }
 
+        regionDto.setHasStreetView(googleStreetViewService.hasStreetView(region.getCoordinate()));
+
         return regionDto;
     }
+
+
 
     private List<RegionDto> getNearestNeighborRegionDtos(Region region) {
         List<Region> neighborRegions = new ArrayList<>();

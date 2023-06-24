@@ -10,6 +10,8 @@ public enum EntityType {
     COSTUME("costume"),
     WEATHER("weather"),
     REVIEW("review"),
+
+    STREET_VIEW("street_view"),
     ;
 
     private final String value;

@@ -70,4 +70,6 @@ public class RegionDto {
     private String path;
 
     private Boolean hasChildren;
+
+    private Boolean hasStreetView;
 }
