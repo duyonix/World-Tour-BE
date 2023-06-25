@@ -456,6 +456,7 @@ public class RegionService {
 
         List<SceneSpotDto> sceneSpotDtos = regionDto.getSceneSpots();
         if (sceneSpotDtos != null) {
+            Collections.sort(sceneSpotDtos, Comparator.comparing(SceneSpotDto::getId));
             addReviewInfoToSceneSpotDtos(sceneSpotDtos);
         }
 
